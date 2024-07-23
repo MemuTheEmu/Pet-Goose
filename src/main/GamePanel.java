@@ -1,5 +1,6 @@
 package main;
 
+import entity.Enemy;
 import entity.Player;
 import tile.TileManager;
 
@@ -23,6 +24,7 @@ public class GamePanel extends JPanel implements Runnable {
     Thread gameThread;
     KeyHandler keyH = new KeyHandler();
     Player player = new Player(this, keyH);
+    Enemy enemy = new Enemy(this, keyH);
     TileManager tileManager = new TileManager(this);
 
     public GamePanel(){
@@ -71,12 +73,14 @@ public class GamePanel extends JPanel implements Runnable {
     }
     public void update(){
        player.update();
+       enemy.update();
     }
     public void paintComponent(Graphics g){
 
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g;
         tileManager.draw(g2);
+        enemy.draw(g2);
         player.draw(g2); // second so is on top of tile
 
         g2.dispose();

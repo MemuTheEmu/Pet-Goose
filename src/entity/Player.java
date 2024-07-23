@@ -20,8 +20,8 @@ public class Player extends Entity{
         getPlayerSprite();
     }
     public void setDefaultValues(){
-        x = 100;
-        y = 100;
+        playerX = 100;
+        playerY = 100;
         speed = 4;
         sprintSpeed = 12;
         direction = "down";
@@ -48,19 +48,19 @@ public class Player extends Entity{
 
         if(keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed){
             if(keyH.upPressed) {
-                y -= speed;
+                playerY -= speed;
                 direction = "up";
             }
             if(keyH.downPressed){
-                y += speed;
+                playerY += speed;
                 direction = "down";
             }
             if(keyH.leftPressed){
-                x -= speed;
+                playerX -= speed;
                 direction = "left";
             }
             if(keyH.rightPressed){
-                x += speed;
+                playerX += speed;
                 direction = "right";
             }
 
@@ -122,6 +122,6 @@ public class Player extends Entity{
                 image = playerStationary;
                 break;
         }
-        g2.drawImage(image, x, y, gp.tileSize, gp.tileSize, null);
+        g2.drawImage(image, playerX, playerY, gp.tileSize, gp.tileSize, null);
     }
 }

@@ -18,9 +18,19 @@ public class Enemy extends Entity{
     public void setDefaultValues(){
         x = 100;
         y = 100;
-        speed = 4;
+        speed = 2;
     }
     public void update(){
+        if(x > playerX){
+            x -= speed;
+        }else if(x < playerX){
+            x += speed;
+        }
+        if(y > playerY){
+            y -= speed;
+        }else if(y < playerY){
+            y += speed;
+        }
     }
     public void draw(Graphics2D g2){
         g2.setColor(Color.white);
