@@ -4,7 +4,7 @@ import java.awt.image.BufferedImage;
 
 public class Entity {
 
-    public int x, y, speed, sprintSpeed;
+    public int x, y, speed, sprintSpeed, speedDirectionX, speedDirectionY;
     public static int playerX, playerY;
 
     public BufferedImage playerUp1, playerUp2, playerStationary, playerDown1, playerDown2, playerLeft1, playerLeft2, playerRight1, playerRight2;

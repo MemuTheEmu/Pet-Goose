@@ -13,6 +13,8 @@ import static java.lang.Thread.sleep;
 public class Player extends Entity{
     GamePanel gp;
     KeyHandler keyH;
+    boolean moving;
+    int pixelCounter;
     public Player(GamePanel gp, KeyHandler keyH){
         this.gp = gp;
         this.keyH = keyH;
@@ -20,11 +22,13 @@ public class Player extends Entity{
         getPlayerSprite();
     }
     public void setDefaultValues(){
-        playerX = 100;
-        playerY = 100;
-        speed = 4;
-        sprintSpeed = 12;
-        direction = "down";
+        playerX = 96; //The location of the player on the x-axis
+        playerY = 96; //The location of the player on the y-axis
+        speed = 3; //Speed of the players movements
+        sprintSpeed = 12; //Speed of the players movements while sprinting
+        direction = "down"; //Direction the player is facing, is down on start
+        moving = false; //Whether the player is moving
+        pixelCounter = 0; //The amount of pixels moved, one tile is 48 pixels
     }
 
     public void getPlayerSprite(){
@@ -44,48 +48,65 @@ public class Player extends Entity{
         }
     }
 
-    public void update(){
-
-        if(keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed){
-            if(keyH.upPressed) {
-                playerY -= speed;
-                direction = "up";
-            }
-            if(keyH.downPressed){
-                playerY += speed;
-                direction = "down";
-            }
-            if(keyH.leftPressed){
-                playerX -= speed;
-                direction = "left";
-            }
-            if(keyH.rightPressed){
-                playerX += speed;
-                direction = "right";
-            }
-
-            playerSpriteCounter ++;
-            if(playerSpriteCounter > 10) {
-                if (playerSpriteNum == 1) {
-                    playerSpriteNum = 2;
-                    System.out.println(playerSpriteNum);
-                } else if (playerSpriteNum == 2) {
-                    playerSpriteNum = 1;
-                    System.out.println(playerSpriteNum);
+    public void update() {
+        if (!moving) { //Only accepts inputs when not moving to make sure player is locked to tile grid
+            if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {//Sets direction of movement from keyboard inputs
+                moving = true;
+                if (keyH.upPressed) {
+                    speedDirectionY = -1;
+                    speedDirectionX = 0;
+                    direction = "up";
                 }
-                playerSpriteCounter = 0;
+                if (keyH.downPressed) {
+                    speedDirectionY = 1;
+                    speedDirectionX = 0;
+                    direction = "down";
+                }
+                if (keyH.leftPressed) {
+                    speedDirectionX = -1;
+                    speedDirectionY = 0;
+                    direction = "left";
+                }
+                if (keyH.rightPressed) {
+                    speedDirectionX = 1;
+                    speedDirectionY = 0;
+                    direction = "right";
+                }//TODO fix animation to make steps happen when tapping a key
+                if(playerSpriteCounter > 10) { //Counter to switch sprite to make an animation playerSpriteCounter is the speed the animation has
+                    if (playerSpriteNum == 1) { //playerSpriteNumber is used to determine which sprite is shown
+                        playerSpriteNum = 2;
+                        System.out.println(playerSpriteNum);
+                    } else if (playerSpriteNum == 2) {
+                        playerSpriteNum = 1;
+                        System.out.println(playerSpriteNum);
+                    }
+                    playerSpriteCounter = 0;
+                }
+            }else{
+                direction = "stationary";
             }
-        }else{
-            direction = "stationary";
-        }
 
+
+        }
+        if (moving) {// while moving the player position and sprite is updated
+            playerSpriteCounter ++;
+            playerX += speedDirectionX * speed;
+            playerY += speedDirectionY * speed;
+            pixelCounter += speed;
+            playerSpriteCounter ++;
+            if (pixelCounter == 48) {
+                moving = false;
+                pixelCounter = 0;
+            }
+        }
+        //System.out.println(pixelCounter);
+        //System.out.println("X:" + playerX);
+        //System.out.println("Y: " + playerY);
 
     }
     public void draw(Graphics2D g2){
-       // g2.setColor(Color.white);
-       // g2.fillRect(x, y, gp.tileSize, gp.tileSize);
         BufferedImage image = null;
-        switch (direction){
+        switch (direction){ //Switch case changes the player sprite depending on the direction, if's change player sprite to make it animated
             case "up":
                 if(playerSpriteNum == 1){
                     image = playerUp1;
@@ -122,6 +143,6 @@ public class Player extends Entity{
                 image = playerStationary;
                 break;
         }
-        g2.drawImage(image, playerX, playerY, gp.tileSize, gp.tileSize, null);
+        g2.drawImage(image, playerX, playerY, gp.tileSize, gp.tileSize, null); //draws the player sprite at the location and size denoted by playerX/Y and gp.tileSize
     }
 }
