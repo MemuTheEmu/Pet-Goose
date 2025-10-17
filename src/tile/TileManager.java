@@ -13,14 +13,14 @@ public class TileManager {
 
     GamePanel gp;
     Tile[] tile;
-    int mapTileNum[][]; //the number corresponding to the tile number in the txt map file
+    int[][] mapTileNum; //the number corresponding to the tile number in the txt map file
 
     public TileManager(GamePanel gp){
         this.gp = gp;
         tile = new Tile[10];
         getTileImage();
-        mapTileNum = new int[gp.maxScreenCol][gp.maxScreenRow];
-        loadMap();
+        mapTileNum = new int[gp.maxWorldCol][gp.maxWorldRow];
+        loadMap("/Maps/map01.txt");
     }
 
     public void getTileImage(){
@@ -39,61 +39,74 @@ public class TileManager {
 
             tile[4] = new Tile();
             tile[4].image = ImageIO.read(getClass().getResourceAsStream("/Tiles/Path_tile.png"));
+
+            tile[5] = new Tile();
+            tile[5].image = ImageIO.read(getClass().getResourceAsStream("/Tiles/Tree_tile.png"));
+
+            tile[6] = new Tile();
+            tile[6].image = ImageIO.read(getClass().getResourceAsStream("/Tiles/Dock_tile.png"));
+
+            tile[7] = new Tile();
+            tile[7].image = ImageIO.read(getClass().getResourceAsStream("/Tiles/Cactus_tile.png"));
         }catch (IOException e){
             e.printStackTrace();
         }
     }
-    public void loadMap(){
+    public void loadMap(String mapPath){
         try{
-            InputStream is = getClass().getResourceAsStream("/Maps/map01.txt");
+            InputStream is = getClass().getResourceAsStream(mapPath);
             BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
             int col = 0;
             int row = 0;
-            while(col < gp.maxScreenCol && row < gp.maxScreenRow){
+            while(col < gp.maxWorldCol && row < gp.maxWorldRow){
                 String line = br.readLine();
 
-                while(col < gp.maxScreenCol){
-                    String numbers[] = line.split(" ");
+                while(col < gp.maxWorldCol){
+                    String[] numbers = line.split(" ");
                     int num = Integer.parseInt(numbers[col]);
                     mapTileNum[col][row] = num;
                     col++;
                 }
-                if(col == gp.maxScreenCol){
+                if(col == gp.maxWorldCol){
                     col = 0;
                     row++;
                 }
             }
             br.close();
         }catch(Exception e){
-                e.printStackTrace();
+
         }
     }
     public void draw(Graphics2D g2){
 
-        int col = 0;
-        int row = 0;
-        int x = 0;
-        int y= 0;
-        while(col < gp.maxScreenCol && row < gp.maxScreenRow) {
+        int worldCol = 0;
+        int worldRow = 0;
 
-            int tileNum = mapTileNum[col][row];
-            System.out.println(tileNum);
 
-            g2.drawImage(tile[tileNum].image, x, y, gp.tileSize, gp.tileSize, null);
-            col++;
-            x += gp.tileSize;
 
-            if(col == gp.maxScreenCol){
-                col = 0;
-                x = 0;
-                row++;
-                y += gp.tileSize;
+        while(worldCol < gp.maxWorldCol && worldRow < gp.maxWorldRow) {
+
+            int tileNum = mapTileNum[worldCol][worldRow];
+
+            int worldX = worldCol * gp.tileSize;
+            int worldY = worldRow * gp.tileSize;
+            int screenX = worldX - gp.player.playerX + gp.player.screenX;
+            int screenY = worldY - gp.player.playerY + gp.player.screenY;
+            if (worldX + gp.tileSize > gp.player.playerX - gp.player.screenX
+                    && worldX - gp.tileSize< gp.player.playerX + gp.player.screenX
+                    && worldY + gp.tileSize > gp.player.playerY - gp.player.screenY
+                    && worldY - gp.tileSize< gp.player.playerY + gp.player.screenY){
+
+                g2.drawImage(tile[tileNum].image, screenX, screenY, gp.tileSize, gp.tileSize, null);
+            }
+            worldCol++;
+            if(worldCol == gp.maxWorldCol){
+                worldCol = 0;
+                worldRow++;
 
             }
         }
-
-        //g2.drawImage(tile[0].image, 0,0,gp.tileSize,gp.tileSize,null);
     }
 
 }

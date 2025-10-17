@@ -18,29 +18,29 @@ public class Enemy extends Entity {
     }
 
     public void setDefaultValues() {
-        x = 240;
-        y = 240;
+        enemyX = 240;
+        enemyY = 240;
         speed = 2;
         moving = false;
     }
 
     public void update() {
-        distanceX = Math.abs(Math.abs(Math.abs(x) - Math.abs(playerX))); // distance of enemy from player horizontally
-        distanceY = Math.abs(Math.abs(Math.abs(y) - Math.abs(playerY))); // distance of enemy from player vertically
+        distanceX = Math.abs(Math.abs(Math.abs(enemyX) - Math.abs(playerX))); // distance of enemy from player horizontally
+        distanceY = Math.abs(Math.abs(Math.abs(enemyY) - Math.abs(playerY))); // distance of enemy from player vertically
         if(!moving){
-            if(playerX > x && distanceX > distanceY){ //checks which direction the player is from the enemy and which distance is greater (x or y distance)
+            if(playerX > enemyX && distanceX > distanceY){ //checks which direction the player is from the enemy and which distance is greater (x or y distance)
                 speedDirectionX = 1; // sets direction x of enemy
                 speedDirectionY = 0; // sets direction y of enemy
-            }else if(playerX < x && distanceX >= distanceY){
+            }else if(playerX < enemyX && distanceX >= distanceY){
                 speedDirectionX = -1;
                 speedDirectionY = 0;
-            }else if(playerY > y && distanceX <= distanceY){
+            }else if(playerY > enemyY && distanceX <= distanceY){
                 speedDirectionY = 1;
                 speedDirectionX = 0;
-            }else if(playerY < y && distanceX < distanceY){
+            }else if(playerY < enemyY && distanceX < distanceY){
                 speedDirectionY = -1;
                 speedDirectionX = 0;
-            }else if(playerX == x && playerY == y){
+            }else if(playerX == enemyX && playerY == enemyY){
                 speedDirectionY = 0;
                 speedDirectionX = 0;
             }
@@ -48,8 +48,8 @@ public class Enemy extends Entity {
         }
         if(moving){
             pixelCounter += speed;
-                x += speed * speedDirectionX;
-                y += speed * speedDirectionY;
+            enemyX += speed * speedDirectionX;
+            enemyY += speed * speedDirectionY;
             if(pixelCounter == 48){
                 moving = false;
                 pixelCounter = 0;
@@ -60,6 +60,6 @@ public class Enemy extends Entity {
     public void draw(Graphics2D g2){
         g2.setColor(Color.white);
 
-        g2.fillRect(x, y, gp.tileSize, gp.tileSize);
+        g2.fillRect(enemyX, enemyY, gp.tileSize, gp.tileSize); //TODO fix so pathing works
     }
 }

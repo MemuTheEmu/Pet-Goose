@@ -15,15 +15,23 @@ public class Player extends Entity{
     KeyHandler keyH;
     boolean moving;
     int pixelCounter;
+
+    public final int screenX;
+    public final int screenY;
+
     public Player(GamePanel gp, KeyHandler keyH){
         this.gp = gp;
         this.keyH = keyH;
+
+        screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
+        screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
+
         setDefaultValues();
         getPlayerSprite();
     }
     public void setDefaultValues(){
-        playerX = 96; //The location of the player on the x-axis
-        playerY = 96; //The location of the player on the y-axis
+        playerX = gp.tileSize * 12; //The location of the player on the x-axis
+        playerY = gp.tileSize * 15; //The location of the player on the y-axis
         speed = 3; //Speed of the players movements
         sprintSpeed = 12; //Speed of the players movements while sprinting
         direction = "down"; //Direction the player is facing, is down on start
@@ -99,10 +107,6 @@ public class Player extends Entity{
                 pixelCounter = 0;
             }
         }
-        //System.out.println(pixelCounter);
-        //System.out.println("X:" + playerX);
-        //System.out.println("Y: " + playerY);
-
     }
     public void draw(Graphics2D g2){
         BufferedImage image = null;
@@ -143,6 +147,6 @@ public class Player extends Entity{
                 image = playerStationary;
                 break;
         }
-        g2.drawImage(image, playerX, playerY, gp.tileSize, gp.tileSize, null); //draws the player sprite at the location and size denoted by playerX/Y and gp.tileSize
+        g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null); //draws the player sprite at the location and size denoted by playerX/Y and gp.tileSize
     }
 }
