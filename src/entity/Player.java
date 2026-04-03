@@ -2,30 +2,27 @@ package entity;
 
 import main.GamePanel;
 import main.KeyHandler;
+import main.Main;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import static java.lang.Thread.sleep;
 
-public class Player extends Entity{
+public class Player extends Entity implements MouseListener {
     GamePanel gp;
     KeyHandler keyH;
     boolean moving;
     int pixelCounter;
-
-    public final int screenX;
-    public final int screenY;
+    double random;
 
     public Player(GamePanel gp, KeyHandler keyH){
         this.gp = gp;
         this.keyH = keyH;
-
-        screenX = gp.screenWidth / 2 - (gp.tileSize / 2);
-        screenY = gp.screenHeight / 2 - (gp.tileSize / 2);
-
         setDefaultValues();
         getPlayerSprite();
     }
@@ -33,23 +30,31 @@ public class Player extends Entity{
         playerX = gp.tileSize * 12; //The location of the player on the x-axis
         playerY = gp.tileSize * 15; //The location of the player on the y-axis
         speed = 3; //Speed of the players movements
-        sprintSpeed = 12; //Speed of the players movements while sprinting
-        direction = "down"; //Direction the player is facing, is down on start
+        //Speed of the players movements while sprinting
+        direction = "downw"; //Direction the player is facing, is down on start
         moving = false; //Whether the player is moving
         pixelCounter = 0; //The amount of pixels moved, one tile is 48 pixels
     }
 
     public void getPlayerSprite(){
         try{
-            playerDown1 = ImageIO.read(getClass().getResourceAsStream("/Player/Character_walk_1.png"));
-            playerDown2 = ImageIO.read(getClass().getResourceAsStream("/Player/Character_walk_2.png"));
-            playerStationary = ImageIO.read(getClass().getResourceAsStream("/Player/Character.png"));
-            playerUp1 = ImageIO.read(getClass().getResourceAsStream("/Player/Character_walk_up_1.png"));
-            playerUp2 = ImageIO.read(getClass().getResourceAsStream("/Player/Character_walk_up_2.png"));
-            playerRight1 = ImageIO.read(getClass().getResourceAsStream("/Player/Character_walk_right_1.png"));
-            playerRight2 = ImageIO.read(getClass().getResourceAsStream("/Player/Character_walk_right_2.png"));
-            playerLeft1 = ImageIO.read(getClass().getResourceAsStream("/Player/Character_walk_left_1.png"));
-            playerLeft2 = ImageIO.read(getClass().getResourceAsStream("/Player/Character_walk_left_2.png"));
+            playerDown1 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Down_1.png"));
+            playerDown2 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Down_2.png"));
+           // playerStationary = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Down.png"));
+            gooseStationaryUp = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Up.png"));
+            gooseStationaryRight = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Right.png"));
+            gooseStationaryDown = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Down.png"));
+            gooseStationaryLeft = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Left.png"));
+            gooseSleepDown1 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Sleep_Down_1.png"));
+            gooseSleepDown2 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Sleep_Down_2.png"));
+            gooseSleepDown3 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Sleep_Down_3.png"));
+
+            playerUp1 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Up_1.png"));
+            playerUp2 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Up_2.png"));
+            playerRight1 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Right_1.png"));
+            playerRight2 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Right_2.png"));
+            playerLeft1 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Left_1.png"));
+            playerLeft2 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Left_2.png"));
 
         }catch (IOException e){
             e.printStackTrace();
@@ -57,7 +62,20 @@ public class Player extends Entity{
     }
 
     public void update() {
-        if (!moving) { //Only accepts inputs when not moving to make sure player is locked to tile grid
+        if (!moving) {
+            /*moving = true;//Only accepts inputs when not moving to make sure player is locked to tile grid
+            random = Math.random();
+            if(random <= 0.5){
+                speedDirectionY = -1;
+                speedDirectionX = 0;
+                direction = "up";
+            }else{
+                speedDirectionY = 1;
+                speedDirectionX = 0;
+                direction = "down";
+
+            }*/
+
             if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {//Sets direction of movement from keyboard inputs
                 moving = true;
                 if (keyH.upPressed) {
@@ -79,7 +97,7 @@ public class Player extends Entity{
                     speedDirectionX = 1;
                     speedDirectionY = 0;
                     direction = "right";
-                }//TODO fix animation to make steps happen when tapping a key
+                }
                 if(playerSpriteCounter > 10) { //Counter to switch sprite to make an animation playerSpriteCounter is the speed the animation has
                     if (playerSpriteNum == 1) { //playerSpriteNumber is used to determine which sprite is shown
                         playerSpriteNum = 2;
@@ -90,11 +108,15 @@ public class Player extends Entity{
                     }
                     playerSpriteCounter = 0;
                 }
-            }else{
-                direction = "stationary";
+            }else if(direction.equals("up")){
+                direction = "stationary up";
+            }else if(direction.equals("right")){
+                direction = "stationary right";
+            }else if(direction.equals("down")){
+                direction = "stationary down";
+            }else if(direction.equals("left")){
+                direction = "stationary left";
             }
-
-
         }
         if (moving) {// while moving the player position and sprite is updated
             playerSpriteCounter ++;
@@ -143,10 +165,58 @@ public class Player extends Entity{
                     image = playerRight2;
                 }
                 break;
-            case "stationary":
-                image = playerStationary;
+            case "stationary up":
+                image = gooseStationaryUp;
+                break;
+            case "stationary right":
+                image = gooseStationaryRight;
+                break;
+            case "stationary down":
+                image = gooseStationaryDown;
+                break;
+            case "stationary left":
+                image = gooseStationaryLeft;
+                break;
+            case "sleep down":
+                image = gooseSleepDown1;
+
+                if(playerSpriteNum == 1){
+                    image = gooseSleepDown2;
+                }
+                if(playerSpriteNum == 2){
+                    image = gooseSleepDown3;
+                }
                 break;
         }
-        g2.drawImage(image, screenX, screenY, gp.tileSize, gp.tileSize, null); //draws the player sprite at the location and size denoted by playerX/Y and gp.tileSize
+        g2.drawImage(image, playerX, playerY, gp.tileSize, gp.tileSize, null); //draws the player sprite at the location and size denoted by playerX/Y and gp.tileSize
+    }
+
+    @Override
+    public void mouseClicked(MouseEvent e) {
+            if(e.getX() == playerX && e.getY() == playerY){
+                // TODO add meno
+            }
+
+        System.out.println(e.getPoint() + " ");
+    }
+
+    @Override
+    public void mousePressed(MouseEvent e) {
+        System.out.println(e.getPoint() + " ");
+    }
+
+    @Override
+    public void mouseReleased(MouseEvent e) {
+        System.out.println(e.getPoint() + " ");
+    }
+
+    @Override
+    public void mouseEntered(MouseEvent e) {
+        System.out.println(e.getPoint() + " ");
+    }
+
+    @Override
+    public void mouseExited(MouseEvent e) {
+        System.out.println(e.getPoint() + " ");
     }
 }

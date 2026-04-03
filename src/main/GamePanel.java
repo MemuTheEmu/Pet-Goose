@@ -1,11 +1,11 @@
 package main;
 
-import entity.Enemy;
 import entity.Player;
-import tile.TileManager;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -16,29 +16,37 @@ public class GamePanel extends JPanel implements Runnable {
     public final int tileSize = originalTileSize * scale;
     public final int maxScreenCol = 16;
     public final int maxScreenRow = 12;
-    public final int screenWidth = tileSize * maxScreenCol;
-    public final int screenHeight = tileSize * maxScreenRow;
+    //public final int screenWidth = tileSize * maxScreenCol;
+   // public final int screenHeight = tileSize * maxScreenRow;
 
     //WORLD SETTINGS
-    public final int maxWorldCol = 50;
-    public final int maxWorldRow = 50;
-    public final int worldWidth = tileSize * maxWorldCol;
-    public final int worldHeight = tileSize * maxWorldRow;
 
     int FPS = 60;
 
     Thread gameThread;
     KeyHandler keyH = new KeyHandler();
     public Player player = new Player(this, keyH);
-    Enemy enemy = new Enemy(this, keyH);
-    TileManager tileManager = new TileManager(this);
 
     public GamePanel(){
-        this.setPreferredSize(new Dimension(screenWidth, screenHeight));
-        this.setBackground(Color.black);
+        this.setPreferredSize(new Dimension(1920,1080));
+        //this.setBackground(Color.BLACK);
+        this.setOpaque(false);
+        //this.setBackground(new Color(0,0,0,0));
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
+        JPopupMenu popupMenu= new JPopupMenu();
+        JMenuItem menuItem1 = new JMenuItem("Item 1");
+        popupMenu.add(menuItem1);
+        this.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e){
+                if(e.isPopupTrigger()){
+                    popupMenu.show(e.getComponent(),e.getX(),e.getY());
+                }
+            }
+        });
+
     }
 
     public void startGameThread(){
@@ -79,14 +87,12 @@ public class GamePanel extends JPanel implements Runnable {
     }
     public void update(){
        player.update();
-       enemy.update();
     }
     public void paintComponent(Graphics g){
 
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g;
-        tileManager.draw(g2);
-        enemy.draw(g2);
+        removeAll();
         player.draw(g2); // second so is on top of tile
 
         g2.dispose();

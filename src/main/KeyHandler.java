@@ -2,11 +2,14 @@ package main;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseListener;
 import java.security.Key;
 
 public class KeyHandler implements KeyListener {
 
     public boolean upPressed, downPressed, rightPressed, leftPressed, shiftPressed;
+
+
 
     @Override
     public void keyTyped(KeyEvent e) {
