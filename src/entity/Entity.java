@@ -5,12 +5,12 @@ import java.awt.image.BufferedImage;
 public class Entity {
 
     public int speed, speedDirectionX, speedDirectionY;
-    public static int playerX, playerY;
+    public static int gooseX, gooseY;
 
-    public BufferedImage playerUp1, playerUp2, playerStationary, playerDown1, playerDown2,
-            playerLeft1, playerLeft2, playerRight1, playerRight2, gooseStationaryRight, gooseStationaryLeft, gooseStationaryUp,
+    public BufferedImage gooseUp1, gooseUp2, gooseDown1, gooseDown2,
+            gooseLeft1, gooseLeft2, gooseRight1, gooseRight2, gooseStationaryRight, gooseStationaryLeft, gooseStationaryUp,
             gooseStationaryDown, gooseSleepDown1, gooseSleepDown2, gooseSleepDown3;
     public String direction;
-    public int playerSpriteCounter = 0;
-    public int playerSpriteNum = 1;
+    public int gooseSpriteCounter = 0;
+    public int gooseSpriteNum = 1;
 }

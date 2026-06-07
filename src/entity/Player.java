@@ -2,7 +2,6 @@ package entity;
 
 import main.GamePanel;
 import main.KeyHandler;
-import main.Main;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -27,20 +26,19 @@ public class Player extends Entity implements MouseListener {
         getPlayerSprite();
     }
     public void setDefaultValues(){
-        playerX = gp.tileSize * 12; //The location of the player on the x-axis
-        playerY = gp.tileSize * 15; //The location of the player on the y-axis
+        gooseX = gp.tileSize * 12; //The location of the player on the x-axis
+        gooseY = gp.tileSize * 15; //The location of the player on the y-axis
         speed = 3; //Speed of the players movements
         //Speed of the players movements while sprinting
-        direction = "downw"; //Direction the player is facing, is down on start
+        direction = "down"; //Direction the player is facing, is down on start
         moving = false; //Whether the player is moving
         pixelCounter = 0; //The amount of pixels moved, one tile is 48 pixels
     }
 
     public void getPlayerSprite(){
         try{
-            playerDown1 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Down_1.png"));
-            playerDown2 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Down_2.png"));
-           // playerStationary = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Down.png"));
+            gooseDown1 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Down_1.png"));
+            gooseDown2 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Down_2.png"));
             gooseStationaryUp = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Up.png"));
             gooseStationaryRight = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Right.png"));
             gooseStationaryDown = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Down.png"));
@@ -48,13 +46,12 @@ public class Player extends Entity implements MouseListener {
             gooseSleepDown1 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Sleep_Down_1.png"));
             gooseSleepDown2 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Sleep_Down_2.png"));
             gooseSleepDown3 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Sleep_Down_3.png"));
-
-            playerUp1 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Up_1.png"));
-            playerUp2 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Up_2.png"));
-            playerRight1 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Right_1.png"));
-            playerRight2 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Right_2.png"));
-            playerLeft1 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Left_1.png"));
-            playerLeft2 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Left_2.png"));
+            gooseUp1 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Up_1.png"));
+            gooseUp2 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Up_2.png"));
+            gooseRight1 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Right_1.png"));
+            gooseRight2 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Right_2.png"));
+            gooseLeft1 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Left_1.png"));
+            gooseLeft2 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Left_2.png"));
 
         }catch (IOException e){
             e.printStackTrace();
@@ -98,15 +95,15 @@ public class Player extends Entity implements MouseListener {
                     speedDirectionY = 0;
                     direction = "right";
                 }
-                if(playerSpriteCounter > 10) { //Counter to switch sprite to make an animation playerSpriteCounter is the speed the animation has
-                    if (playerSpriteNum == 1) { //playerSpriteNumber is used to determine which sprite is shown
-                        playerSpriteNum = 2;
-                        System.out.println(playerSpriteNum);
-                    } else if (playerSpriteNum == 2) {
-                        playerSpriteNum = 1;
-                        System.out.println(playerSpriteNum);
+                if(gooseSpriteCounter > 10) { //Counter to switch sprite to make an animation playerSpriteCounter is the speed the animation has
+                    if (gooseSpriteNum == 1) { //playerSpriteNumber is used to determine which sprite is shown
+                        gooseSpriteNum = 2;
+                        System.out.println(gooseSpriteNum);
+                    } else if (gooseSpriteNum == 2) {
+                        gooseSpriteNum = 1;
+                        System.out.println(gooseSpriteNum);
                     }
-                    playerSpriteCounter = 0;
+                    gooseSpriteCounter = 0;
                 }
             }else if(direction.equals("up")){
                 direction = "stationary up";
@@ -119,11 +116,11 @@ public class Player extends Entity implements MouseListener {
             }
         }
         if (moving) {// while moving the player position and sprite is updated
-            playerSpriteCounter ++;
-            playerX += speedDirectionX * speed;
-            playerY += speedDirectionY * speed;
+            gooseSpriteCounter++;
+            gooseX += speedDirectionX * speed;
+            gooseY += speedDirectionY * speed;
             pixelCounter += speed;
-            playerSpriteCounter ++;
+            gooseSpriteCounter++;
             if (pixelCounter == 48) {
                 moving = false;
                 pixelCounter = 0;
@@ -134,35 +131,35 @@ public class Player extends Entity implements MouseListener {
         BufferedImage image = null;
         switch (direction){ //Switch case changes the player sprite depending on the direction, if's change player sprite to make it animated
             case "up":
-                if(playerSpriteNum == 1){
-                    image = playerUp1;
+                if(gooseSpriteNum == 1){
+                    image = gooseUp1;
                 }
-                if(playerSpriteNum == 2){
-                 image = playerUp2;
+                if(gooseSpriteNum == 2){
+                 image = gooseUp2;
                 }
                 break;
             case "down":
-                if(playerSpriteNum == 1){
-                    image = playerDown1;
+                if(gooseSpriteNum == 1){
+                    image = gooseDown1;
                 }
-                if(playerSpriteNum == 2){
-                    image = playerDown2;
+                if(gooseSpriteNum == 2){
+                    image = gooseDown2;
                 }
                 break;
             case "left":
-                if(playerSpriteNum == 1){
-                    image = playerLeft1;
+                if(gooseSpriteNum == 1){
+                    image = gooseLeft1;
                 }
-                if(playerSpriteNum == 2){
-                    image = playerLeft2;
+                if(gooseSpriteNum == 2){
+                    image = gooseLeft2;
                 }
                 break;
             case "right":
-                if(playerSpriteNum == 1){
-                    image = playerRight1;
+                if(gooseSpriteNum == 1){
+                    image = gooseRight1;
                 }
-                if(playerSpriteNum == 2){
-                    image = playerRight2;
+                if(gooseSpriteNum == 2){
+                    image = gooseRight2;
                 }
                 break;
             case "stationary up":
@@ -180,20 +177,20 @@ public class Player extends Entity implements MouseListener {
             case "sleep down":
                 image = gooseSleepDown1;
 
-                if(playerSpriteNum == 1){
+                if(gooseSpriteNum == 1){
                     image = gooseSleepDown2;
                 }
-                if(playerSpriteNum == 2){
+                if(gooseSpriteNum == 2){
                     image = gooseSleepDown3;
                 }
                 break;
         }
-        g2.drawImage(image, playerX, playerY, gp.tileSize, gp.tileSize, null); //draws the player sprite at the location and size denoted by playerX/Y and gp.tileSize
+        g2.drawImage(image, gooseX, gooseY, gp.tileSize, gp.tileSize, null); //draws the player sprite at the location and size denoted by playerX/Y and gp.tileSize
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-            if(e.getX() == playerX && e.getY() == playerY){
+            if(e.getX() == gooseX && e.getY() == gooseY){
                 // TODO add meno
             }
 
