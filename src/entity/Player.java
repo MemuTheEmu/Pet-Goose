@@ -1,23 +1,23 @@
 package entity;
-
 import main.GamePanel;
 import main.KeyHandler;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.Random;
 
-import static java.lang.Thread.sleep;
 
 public class Player extends Entity implements MouseListener {
     GamePanel gp;
     KeyHandler keyH;
     boolean moving;
     int pixelCounter;
-    double random;
+    Random random = new Random();
+    int gooseController = -1, gooseMovement;
+
 
     public Player(GamePanel gp, KeyHandler keyH){
         this.gp = gp;
@@ -31,9 +31,10 @@ public class Player extends Entity implements MouseListener {
         speed = 3; //Speed of the players movements
         //Speed of the players movements while sprinting
         direction = "down"; //Direction the player is facing, is down on start
-        moving = false; //Whether the player is moving
+        ; //Whether the player is moving
         pixelCounter = 0; //The amount of pixels moved, one tile is 48 pixels
     }
+
 
     public void getPlayerSprite(){
         try{
@@ -53,79 +54,97 @@ public class Player extends Entity implements MouseListener {
             gooseLeft1 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Left_1.png"));
             gooseLeft2 = ImageIO.read(getClass().getResourceAsStream("/Goose/Goose_Left_2.png"));
 
+
         }catch (IOException e){
             e.printStackTrace();
         }
     }
 
+
     public void update() {
         if (!moving) {
-            /*moving = true;//Only accepts inputs when not moving to make sure player is locked to tile grid
-            random = Math.random();
-            if(random <= 0.5){
-                speedDirectionY = -1;
-                speedDirectionX = 0;
-                direction = "up";
-            }else{
-                speedDirectionY = 1;
-                speedDirectionX = 0;
-                direction = "down";
-
+        gooseController = random.nextInt(101);
+        }
+        //System.out.println("Control: " + gooseController);
+        //System.out.println(gooseController);
+        //if (/*gooseController != -1*/ keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {//Sets direction of movement from keyboard inputs
+        //gooseController = -1;
+        //gooseMovement = random.nextInt(101) + 10;
+        //moving = true;
+               /*if (keyH.upPressed || gooseController <= 20) {
+                   speedDirectionY = -1;
+                   speedDirectionX = 0;
+                   direction = "up";
+               }
+               if (keyH.downPressed) {
+                   speedDirectionY = 1;
+                   speedDirectionX = 0;
+                   direction = "down";
+               }*/
+        if (/*keyH.leftPressed*/ gooseController >= 50) {
+            //gooseController = -1;
+            gooseMovement = random.nextInt(101) + 100;
+            moving = true;
+            //System.out.println("Move: " + gooseMovement);
+            speedDirectionX = -1;
+            speedDirectionY = 0;
+            direction = "left";
+        }
+        if (/*keyH.rightPressed*/ gooseController < 50) {
+            //gooseController = -1;
+            gooseMovement = random.nextInt(101) + 100;
+            moving = true;
+            //System.out.println("Move: " + gooseMovement);
+            speedDirectionX = 1;
+            speedDirectionY = 0;
+            direction = "right";
+        }
+        if(gooseSpriteCounter > 10) { //Counter to switch sprite to make an animation playerSpriteCounter is the speed the animation has
+            if (gooseSpriteNum == 1) { //playerSpriteNumber is used to determine which sprite is shown
+                gooseSpriteNum = 2;
+                //System.out.println(gooseSpriteNum);
+            } else if (gooseSpriteNum == 2) {
+                gooseSpriteNum = 1;
+                //System.out.println(gooseSpriteNum);
+            }
+            gooseSpriteCounter = 0;
+        }
+    /*}else if(direction.equals("up")){
+        direction = "stationary up";
+    }else if(direction.equals("right")){
+        direction = "stationary right";
+    }else if(direction.equals("down")){
+        direction = "stationary down";
+    }else if(direction.equals("left")){
+        direction = "stationary left";
             }*/
-
-            if (keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {//Sets direction of movement from keyboard inputs
-                moving = true;
-                if (keyH.upPressed) {
-                    speedDirectionY = -1;
-                    speedDirectionX = 0;
-                    direction = "up";
-                }
-                if (keyH.downPressed) {
-                    speedDirectionY = 1;
-                    speedDirectionX = 0;
-                    direction = "down";
-                }
-                if (keyH.leftPressed) {
-                    speedDirectionX = -1;
-                    speedDirectionY = 0;
-                    direction = "left";
-                }
-                if (keyH.rightPressed) {
-                    speedDirectionX = 1;
-                    speedDirectionY = 0;
-                    direction = "right";
-                }
-                if(gooseSpriteCounter > 10) { //Counter to switch sprite to make an animation playerSpriteCounter is the speed the animation has
-                    if (gooseSpriteNum == 1) { //playerSpriteNumber is used to determine which sprite is shown
-                        gooseSpriteNum = 2;
-                        System.out.println(gooseSpriteNum);
-                    } else if (gooseSpriteNum == 2) {
-                        gooseSpriteNum = 1;
-                        System.out.println(gooseSpriteNum);
-                    }
-                    gooseSpriteCounter = 0;
-                }
-            }else if(direction.equals("up")){
-                direction = "stationary up";
-            }else if(direction.equals("right")){
-                direction = "stationary right";
-            }else if(direction.equals("down")){
-                direction = "stationary down";
-            }else if(direction.equals("left")){
-                direction = "stationary left";
+        //}
+        //if (moving) {// while moving the player position and sprite is updated
+        //System.out.println("Sprite Counter: " + gooseSpriteNum);
+        gooseSpriteCounter++;
+        gooseX += speedDirectionX * speed;
+        gooseY += speedDirectionY * speed;
+        pixelCounter += speed;
+        //gooseSpriteCounter++;
+        //gooseMovement = random.nextInt()+100;
+        //moving = false;
+        if(gooseSpriteCounter > 10) { //Counter to switch sprite to make an animation playerSpriteCounter is the speed the animation has
+            if (gooseSpriteNum == 1) { //playerSpriteNumber is used to determine which sprite is shown
+                gooseSpriteNum = 2;
+                System.out.println(gooseSpriteNum);
+            } else if (gooseSpriteNum == 2) {
+                gooseSpriteNum = 1;
+                System.out.println(gooseSpriteNum);
             }
+            gooseSpriteCounter = 0;
         }
-        if (moving) {// while moving the player position and sprite is updated
-            gooseSpriteCounter++;
-            gooseX += speedDirectionX * speed;
-            gooseY += speedDirectionY * speed;
-            pixelCounter += speed;
-            gooseSpriteCounter++;
-            if (pixelCounter == 48) {
-                moving = false;
-                pixelCounter = 0;
-            }
+        if (pixelCounter >= gooseMovement /*48*/) {
+            //System.out.println("Pixel: " + pixelCounter);
+            moving = false;
+            pixelCounter = 0;
+            //gooseSpriteCounter++;
         }
+        //}
     }
     public void draw(Graphics2D g2){
         BufferedImage image = null;
@@ -135,7 +154,7 @@ public class Player extends Entity implements MouseListener {
                     image = gooseUp1;
                 }
                 if(gooseSpriteNum == 2){
-                 image = gooseUp2;
+                    image = gooseUp2;
                 }
                 break;
             case "down":
@@ -177,6 +196,7 @@ public class Player extends Entity implements MouseListener {
             case "sleep down":
                 image = gooseSleepDown1;
 
+
                 if(gooseSpriteNum == 1){
                     image = gooseSleepDown2;
                 }
@@ -188,32 +208,39 @@ public class Player extends Entity implements MouseListener {
         g2.drawImage(image, gooseX, gooseY, gp.tileSize, gp.tileSize, null); //draws the player sprite at the location and size denoted by playerX/Y and gp.tileSize
     }
 
+
     @Override
     public void mouseClicked(MouseEvent e) {
-            if(e.getX() == gooseX && e.getY() == gooseY){
-                // TODO add meno
-            }
+        if(e.getX() == gooseX && e.getY() == gooseY){
+            // TODO add menu
+        }
+
 
         System.out.println(e.getPoint() + " ");
     }
+
 
     @Override
     public void mousePressed(MouseEvent e) {
         System.out.println(e.getPoint() + " ");
     }
 
+
     @Override
     public void mouseReleased(MouseEvent e) {
         System.out.println(e.getPoint() + " ");
     }
+
 
     @Override
     public void mouseEntered(MouseEvent e) {
         System.out.println(e.getPoint() + " ");
     }
 
+
     @Override
     public void mouseExited(MouseEvent e) {
         System.out.println(e.getPoint() + " ");
     }
 }
+
