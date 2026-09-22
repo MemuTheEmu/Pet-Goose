@@ -17,6 +17,9 @@ public class Player extends Entity implements MouseListener {
     int pixelCounter;
     Random random = new Random();
     int gooseController = -1, gooseMovement;
+    GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+    Rectangle screenSize = ge.getDefaultScreenDevice().getDefaultConfiguration().getBounds();
+    int screenWidth;
 
 
     public Player(GamePanel gp, KeyHandler keyH){
@@ -26,13 +29,15 @@ public class Player extends Entity implements MouseListener {
         getPlayerSprite();
     }
     public void setDefaultValues(){
-        gooseX = gp.tileSize * 12; //The location of the player on the x-axis
+        gooseX = screenWidth + 960; //The location of the player on the x-axis
         gooseY = gp.tileSize * 15; //The location of the player on the y-axis
         speed = 3; //Speed of the players movements
         //Speed of the players movements while sprinting
         direction = "down"; //Direction the player is facing, is down on start
         ; //Whether the player is moving
         pixelCounter = 0; //The amount of pixels moved, one tile is 48 pixels
+        screenWidth = (int)screenSize.getWidth();
+
     }
 
 
@@ -63,7 +68,7 @@ public class Player extends Entity implements MouseListener {
 
     public void update() {
         if (!moving) {
-        gooseController = random.nextInt(101);
+        gooseController = random.nextInt(101)-100;
         }
         //System.out.println("Control: " + gooseController);
         //System.out.println(gooseController);
@@ -122,8 +127,14 @@ public class Player extends Entity implements MouseListener {
         //if (moving) {// while moving the player position and sprite is updated
         //System.out.println("Sprite Counter: " + gooseSpriteNum);
         gooseSpriteCounter++;
-        gooseX += speedDirectionX * speed;
-        gooseY += speedDirectionY * speed;
+        if((gooseX + speed + gp.tileSize) <= screenWidth && (gooseX - speed) >= 0){
+            gooseX += speedDirectionX * speed;
+            System.out.println("Goose X: " + gooseX);
+        }else{
+            direction ="stationary " + direction;
+        }
+
+        //gooseY += speedDirectionY * speed;
         pixelCounter += speed;
         //gooseSpriteCounter++;
         //gooseMovement = random.nextInt()+100;
