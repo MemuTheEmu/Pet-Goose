@@ -53,6 +53,11 @@ jobs:
             --dest build/package \
             --app-version 1.0.0 \
             --vendor "Pet Goose"
+      - name: Zip Windows application
+        shell: bash
+        run: |
+          cd build/package
+          7z a ../../Pet-Goose-Windows.zip "Pet-Goose"
 
       - name: Upload Windows application
         uses: actions/upload-artifact@v4
