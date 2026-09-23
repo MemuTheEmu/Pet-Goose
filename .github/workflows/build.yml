@@ -48,7 +48,7 @@ jobs:
           mkdir -p build/package
 
           jpackage \
-            --type exe \
+            --type app-image \
             --input build/input \
             --name Pet-Goose \
             --main-jar Pet-Goose.jar \
