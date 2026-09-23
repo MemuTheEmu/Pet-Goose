@@ -27,11 +27,8 @@ jobs:
           rm -rf build
           mkdir -p build/classes
           mkdir -p build/input
-
           find src -name "*.java" > sources.txt
-
           javac -d build/classes @sources.txt
-
           cp -R res/. build/classes/
 
       - name: Create JAR
@@ -57,11 +54,11 @@ jobs:
             --app-version 1.0.0 \
             --vendor "Pet Goose"
 
-      - name: Upload Windows build
+      - name: Upload Windows application
         uses: actions/upload-artifact@v4
         with:
           name: Pet-Goose-Windows
-          path: build/package/*.exe
+          path: build/package/Pet-Goose/
 
 
   build-macos-arm64:
@@ -84,11 +81,8 @@ jobs:
           rm -rf build
           mkdir -p build/classes
           mkdir -p build/input
-
           find src -name "*.java" > sources.txt
-
           javac -d build/classes @sources.txt
-
           cp -R res/. build/classes/
 
       - name: Create JAR
@@ -147,11 +141,8 @@ jobs:
           rm -rf build
           mkdir -p build/classes
           mkdir -p build/input
-
           find src -name "*.java" > sources.txt
-
           javac -d build/classes @sources.txt
-
           cp -R res/. build/classes/
 
       - name: Create JAR
