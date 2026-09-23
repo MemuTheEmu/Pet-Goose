@@ -1,185 +1,187 @@
 name: Build Pet Goose
 
 on:
-workflow_dispatch:
+  workflow_dispatch:
 
 jobs:
-build-windows:
-name: Build Windows
-runs-on: windows-latest
+  build-windows:
+    name: Build Windows
+    runs-on: windows-latest
 
-steps:
-  - name: Checkout
-    uses: actions/checkout@v4
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  - name: Set up Java
-    uses: actions/setup-java@v4
-    with:
-      distribution: temurin
-      java-version: '21'
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
 
-  - name: Compile Java
-    shell: bash
-    run: |
-      rm -rf build
-      mkdir -p build/classes
-      mkdir -p build/input
+      - name: Compile Java
+        shell: bash
+        run: |
+          rm -rf build
+          mkdir -p build/classes
+          mkdir -p build/input
 
-      find src -name "*.java" > sources.txt
+          find src -name "*.java" > sources.txt
 
-      javac -d build/classes @sources.txt
+          javac -d build/classes @sources.txt
 
-      cp -R res/. build/classes/
+          cp -R res/. build/classes/
 
-  - name: Create JAR
-    shell: bash
-    run: |
-      jar --create \
-        --file build/input/Pet-Goose.jar \
-        --main-class main.Main \
-        -C build/classes .
+      - name: Create JAR
+        shell: bash
+        run: |
+          jar --create \
+            --file build/input/Pet-Goose.jar \
+            --main-class main.Main \
+            -C build/classes .
 
-  - name: Create Windows application
-    shell: bash
-    run: |
-      mkdir -p build/package
+      - name: Create Windows application
+        shell: bash
+        run: |
+          mkdir -p build/package
 
-      jpackage \
-        --type exe \
-        --input build/input \
-        --name Pet-Goose \
-        --main-jar Pet-Goose.jar \
-        --main-class main.Main \
-        --dest build/package \
-        --app-version 1.0.0 \
-        --vendor "Pet Goose"
+          jpackage \
+            --type exe \
+            --input build/input \
+            --name Pet-Goose \
+            --main-jar Pet-Goose.jar \
+            --main-class main.Main \
+            --dest build/package \
+            --app-version 1.0.0 \
+            --vendor "Pet Goose"
 
-  - name: Upload Windows build
-    uses: actions/upload-artifact@v4
-    with:
-      name: Pet-Goose-Windows
-      path: build/package/*.exe
+      - name: Upload Windows build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Pet-Goose-Windows
+          path: build/package/*.exe
 
-build-macos-arm64:
-name: Build macOS Apple Silicon
-runs-on: macos-15
 
-steps:
-  - name: Checkout
-    uses: actions/checkout@v4
+  build-macos-arm64:
+    name: Build macOS Apple Silicon
+    runs-on: macos-15
 
-  - name: Set up Java
-    uses: actions/setup-java@v4
-    with:
-      distribution: temurin
-      java-version: '21'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-  - name: Compile Java
-    shell: bash
-    run: |
-      rm -rf build
-      mkdir -p build/classes
-      mkdir -p build/input
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
 
-      find src -name "*.java" > sources.txt
+      - name: Compile Java
+        shell: bash
+        run: |
+          rm -rf build
+          mkdir -p build/classes
+          mkdir -p build/input
 
-      javac -d build/classes @sources.txt
+          find src -name "*.java" > sources.txt
 
-      cp -R res/. build/classes/
+          javac -d build/classes @sources.txt
 
-  - name: Create JAR
-    shell: bash
-    run: |
-      jar --create \
-        --file build/input/Pet-Goose.jar \
-        --main-class main.Main \
-        -C build/classes .
+          cp -R res/. build/classes/
 
-  - name: Create macOS application
-    shell: bash
-    run: |
-      mkdir -p build/package
+      - name: Create JAR
+        shell: bash
+        run: |
+          jar --create \
+            --file build/input/Pet-Goose.jar \
+            --main-class main.Main \
+            -C build/classes .
 
-      jpackage \
-        --type app-image \
-        --input build/input \
-        --name Pet-Goose \
-        --main-jar Pet-Goose.jar \
-        --main-class main.Main \
-        --dest build/package \
-        --app-version 1.0.0 \
-        --vendor "Pet Goose"
+      - name: Create macOS application
+        shell: bash
+        run: |
+          mkdir -p build/package
 
-  - name: Zip macOS application
-    shell: bash
-    run: |
-      cd build/package
-      zip -r ../../Pet-Goose-macOS-AppleSilicon.zip "Pet-Goose.app"
+          jpackage \
+            --type app-image \
+            --input build/input \
+            --name Pet-Goose \
+            --main-jar Pet-Goose.jar \
+            --main-class main.Main \
+            --dest build/package \
+            --app-version 1.0.0 \
+            --vendor "Pet Goose"
 
-  - name: Upload macOS build
-    uses: actions/upload-artifact@v4
-    with:
-      name: Pet-Goose-macOS-AppleSilicon
-      path: Pet-Goose-macOS-AppleSilicon.zip
+      - name: Zip macOS application
+        shell: bash
+        run: |
+          cd build/package
+          zip -r ../../Pet-Goose-macOS-AppleSilicon.zip "Pet-Goose.app"
 
-build-macos-intel:
-name: Build macOS Intel
-runs-on: macos-15-intel
+      - name: Upload macOS build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Pet-Goose-macOS-AppleSilicon
+          path: Pet-Goose-macOS-AppleSilicon.zip
 
-steps:
-  - name: Checkout
-    uses: actions/checkout@v4
 
-  - name: Set up Java
-    uses: actions/setup-java@v4
-    with:
-      distribution: temurin
-      java-version: '21'
+  build-macos-intel:
+    name: Build macOS Intel
+    runs-on: macos-15-intel
 
-  - name: Compile Java
-    shell: bash
-    run: |
-      rm -rf build
-      mkdir -p build/classes
-      mkdir -p build/input
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      find src -name "*.java" > sources.txt
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
 
-      javac -d build/classes @sources.txt
+      - name: Compile Java
+        shell: bash
+        run: |
+          rm -rf build
+          mkdir -p build/classes
+          mkdir -p build/input
 
-      cp -R res/. build/classes/
+          find src -name "*.java" > sources.txt
 
-  - name: Create JAR
-    shell: bash
-    run: |
-      jar --create \
-        --file build/input/Pet-Goose.jar \
-        --main-class main.Main \
-        -C build/classes .
+          javac -d build/classes @sources.txt
 
-  - name: Create macOS application
-    shell: bash
-    run: |
-      mkdir -p build/package
+          cp -R res/. build/classes/
 
-      jpackage \
-        --type app-image \
-        --input build/input \
-        --name Pet-Goose \
-        --main-jar Pet-Goose.jar \
-        --main-class main.Main \
-        --dest build/package \
-        --app-version 1.0.0 \
-        --vendor "Pet Goose"
+      - name: Create JAR
+        shell: bash
+        run: |
+          jar --create \
+            --file build/input/Pet-Goose.jar \
+            --main-class main.Main \
+            -C build/classes .
 
-  - name: Zip macOS application
-    shell: bash
-    run: |
-      cd build/package
-      zip -r ../../Pet-Goose-macOS-Intel.zip "Pet-Goose.app"
+      - name: Create macOS application
+        shell: bash
+        run: |
+          mkdir -p build/package
 
-  - name: Upload macOS build
-    uses: actions/upload-artifact@v4
-    with:
-      name: Pet-Goose-macOS-Intel
-      path: Pet-Goose-macOS-Intel.zip
+          jpackage \
+            --type app-image \
+            --input build/input \
+            --name Pet-Goose \
+            --main-jar Pet-Goose.jar \
+            --main-class main.Main \
+            --dest build/package \
+            --app-version 1.0.0 \
+            --vendor "Pet Goose"
+
+      - name: Zip macOS application
+        shell: bash
+        run: |
+          cd build/package
+          zip -r ../../Pet-Goose-macOS-Intel.zip "Pet-Goose.app"
+
+      - name: Upload macOS build
+        uses: actions/upload-artifact@v4
+        with:
+          name: Pet-Goose-macOS-Intel
+          path: Pet-Goose-macOS-Intel.zip
