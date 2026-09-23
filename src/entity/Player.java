@@ -19,7 +19,7 @@ public class Player extends Entity implements MouseListener {
     int gooseController = -1, gooseMovement;
     GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
     Rectangle screenSize = ge.getDefaultScreenDevice().getDefaultConfiguration().getBounds();
-    int screenWidth;
+    int screenWidth, screenHeight;
 
 
     public Player(GamePanel gp, KeyHandler keyH){
@@ -29,15 +29,15 @@ public class Player extends Entity implements MouseListener {
         getPlayerSprite();
     }
     public void setDefaultValues(){
+        screenWidth = (int)screenSize.getWidth();
+        screenHeight = (int)screenSize.getHeight();//Gets screen width
         gooseX = screenWidth + 960; //The location of the player on the x-axis
-        gooseY = gp.tileSize * 15; //The location of the player on the y-axis
+        gooseY = screenHeight + 200; //The location of the player on the y-axis
         speed = 3; //Speed of the players movements
         //Speed of the players movements while sprinting
         direction = "down"; //Direction the player is facing, is down on start
         ; //Whether the player is moving
         pixelCounter = 0; //The amount of pixels moved, one tile is 48 pixels
-        screenWidth = (int)screenSize.getWidth();
-
     }
 
 
@@ -68,24 +68,20 @@ public class Player extends Entity implements MouseListener {
 
     public void update() {
         if (!moving) {
-        gooseController = random.nextInt(101)-100;
+            gooseController = random.nextInt(101)-100;
         }
         //System.out.println("Control: " + gooseController);
         //System.out.println(gooseController);
-        //if (/*gooseController != -1*/ keyH.upPressed || keyH.downPressed || keyH.leftPressed || keyH.rightPressed) {//Sets direction of movement from keyboard inputs
-        //gooseController = -1;
-        //gooseMovement = random.nextInt(101) + 10;
-        //moving = true;
-               /*if (keyH.upPressed || gooseController <= 20) {
-                   speedDirectionY = -1;
-                   speedDirectionX = 0;
-                   direction = "up";
-               }
-               if (keyH.downPressed) {
-                   speedDirectionY = 1;
-                   speedDirectionX = 0;
-                   direction = "down";
-               }*/
+        /*if (keyH.upPressed || gooseController <= 20) {
+           speedDirectionY = -1;
+           speedDirectionX = 0;
+           direction = "up";
+        }
+        if (keyH.downPressed) {
+           speedDirectionY = 1;
+           speedDirectionX = 0;
+           direction = "down";
+        }*/
         if (/*keyH.leftPressed*/ gooseController >= 50) {
             //gooseController = -1;
             gooseMovement = random.nextInt(101) + 100;
@@ -97,7 +93,7 @@ public class Player extends Entity implements MouseListener {
         }
         if (/*keyH.rightPressed*/ gooseController < 50) {
             //gooseController = -1;
-            gooseMovement = random.nextInt(101) + 100;
+            gooseMovement = random.nextInt(101);
             moving = true;
             //System.out.println("Move: " + gooseMovement);
             speedDirectionX = 1;
@@ -114,17 +110,7 @@ public class Player extends Entity implements MouseListener {
             }
             gooseSpriteCounter = 0;
         }
-    /*}else if(direction.equals("up")){
-        direction = "stationary up";
-    }else if(direction.equals("right")){
-        direction = "stationary right";
-    }else if(direction.equals("down")){
-        direction = "stationary down";
-    }else if(direction.equals("left")){
-        direction = "stationary left";
-            }*/
-        //}
-        //if (moving) {// while moving the player position and sprite is updated
+        // while moving the player position and sprite is updated
         //System.out.println("Sprite Counter: " + gooseSpriteNum);
         gooseSpriteCounter++;
         if((gooseX + speed + gp.tileSize) <= screenWidth && (gooseX - speed) >= 0){
@@ -136,9 +122,6 @@ public class Player extends Entity implements MouseListener {
 
         //gooseY += speedDirectionY * speed;
         pixelCounter += speed;
-        //gooseSpriteCounter++;
-        //gooseMovement = random.nextInt()+100;
-        //moving = false;
         if(gooseSpriteCounter > 10) { //Counter to switch sprite to make an animation playerSpriteCounter is the speed the animation has
             if (gooseSpriteNum == 1) { //playerSpriteNumber is used to determine which sprite is shown
                 gooseSpriteNum = 2;
@@ -153,9 +136,9 @@ public class Player extends Entity implements MouseListener {
             //System.out.println("Pixel: " + pixelCounter);
             moving = false;
             pixelCounter = 0;
-            //gooseSpriteCounter++;
+
         }
-        //}
+
     }
     public void draw(Graphics2D g2){
         BufferedImage image = null;
@@ -222,17 +205,17 @@ public class Player extends Entity implements MouseListener {
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if(e.getX() == gooseX && e.getY() == gooseY){
-            // TODO add menu
-        }
-
-
+        Rectangle gooseHitBox = new Rectangle(gooseX, gooseY+gp.tileSize);
+        //if(e.getX() >= gooseX && e.getX() <= (gooseX+gp.tileSize) && e.getY() >= gooseY && e.getY() <= (gooseY+gp.tileSize)){
+            System.out.println("CLICK");
+        //}
         System.out.println(e.getPoint() + " ");
     }
 
 
     @Override
     public void mousePressed(MouseEvent e) {
+
         System.out.println(e.getPoint() + " ");
     }
 
