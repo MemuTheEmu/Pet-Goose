@@ -29,7 +29,7 @@ public class GamePanel extends JPanel implements Runnable {
     public Player player;
 
     public GamePanel(JFrame window){
-        this.setPreferredSize(new Dimension(1920,1080));
+        this.setPreferredSize(new Dimension(48,48));
         //this.setBackground(Color.BLACK);
         this.setOpaque(false);
         //this.setBackground(new Color(0,0,0,0));

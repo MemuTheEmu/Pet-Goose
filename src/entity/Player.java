@@ -15,10 +15,10 @@ public class Player extends Entity{
     JFrame window;
     GamePanel gp;
     KeyHandler keyH;
-    boolean moving, lastCanadian = Main.canadian;
+    boolean moving, lastCanadian = Main.canadian, sitting, nextAction;
     int pixelCounter;
     Random random = new Random();
-    int gooseController = -1, gooseMovement;
+    int gooseController = -1, gooseActionTime;
     GraphicsDevice screen = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 
     Rectangle screenSize = screen.getDefaultConfiguration().getBounds();
@@ -43,6 +43,7 @@ public class Player extends Entity{
         direction = "down"; //Direction the player is facing, is down on start
         ; //Whether the player is moving
         pixelCounter = 0;
+        sitting = false;
     }
 
 
@@ -78,21 +79,15 @@ public class Player extends Entity{
             getGooseSprite();
         }
         if (!moving) {
-            gooseController = random.nextInt(101) - 100;
-            gooseMovement = random.nextInt(101) + 100;
-        }
-        //System.out.println("Control: " + gooseController);
-        //System.out.println(gooseController);
-        /*if (keyH.upPressed || gooseController <= 20) {
-           speedDirectionY = -1;
-           speedDirectionX = 0;
-           direction = "up";
-        }
-        if (keyH.downPressed) {
-           speedDirectionY = 1;
-           speedDirectionX = 0;
-           direction = "down";
+            gooseController = random.nextInt(101);
+            gooseActionTime = random.nextInt(101) + 500;
+            System.out.println("Action: " + gooseActionTime);
+            System.out.println("Control: " + gooseController);
+        }/*else if(!sitting && nextAction){
+            gooseActionTime = random.nextInt(101) + 100;
         }*/
+
+        //System.out.println(gooseController);
         if (gooseController >= 50) { // Move left
             moving = true;
             //System.out.println("Move: " + gooseMovement);
@@ -100,23 +95,35 @@ public class Player extends Entity{
             speedDirectionY = 0;
             direction = "left";
         }
-        if (gooseController < 50) { // Move right
+        if (gooseController > 10 && gooseController < 50) { // Move right
             moving = true;
             //System.out.println("Move: " + gooseMovement);
             speedDirectionX = 1;
             speedDirectionY = 0;
             direction = "right";
         }
+        if(gooseController <= 10){
+            speedDirectionX = 0;
+            speedDirectionY = 0;
+            direction = "down";
+            moving = true;
+        }
         // while moving the player position and sprite is updated
         //System.out.println("Sprite Counter: " + gooseSpriteNum);
         gooseSpriteCounter++;
+        if(sitting){
+            System.out.println("Pixel: " + pixelCounter);
+            pixelCounter += speed;
+        }
         if ((gooseX + speed + gp.tileSize) <= (screenSize.x + screenWidth) && (gooseX - speed) >= screenSize.x) {
             gooseX += speedDirectionX * speed;
             window.setLocation(gooseX,gooseY);
             //System.out.println("Goose X: " + gooseX);
         }
         else {
+            gooseX += speedDirectionX * -speed;
             direction = "stationary " + direction;
+            gooseActionTime = 0;
         }
         //gooseY += speedDirectionY * speed;
         pixelCounter += speed;
@@ -124,13 +131,11 @@ public class Player extends Entity{
             gooseSpriteNum = (gooseSpriteNum == 1) ? 2 : 1;
             gooseSpriteCounter = 0;
         }
-        if (pixelCounter >= gooseMovement) {
+        if (pixelCounter >= gooseActionTime) {
             //System.out.println("Pixel: " + pixelCounter);
             moving = false;
             pixelCounter = 0;
-
         }
-
     }
 
     public void draw(Graphics2D g2) {
@@ -173,6 +178,5 @@ public class Player extends Entity{
                 break;
         }
         g2.drawImage(image, 0/*gooseX*/, /*gooseY*/ 0, gp.tileSize, gp.tileSize, null); //draws the player sprite at the location and size denoted by playerX/Y and gp.tileSize
-       // window.setLocation(gooseX,gooseY);
     }
 }
