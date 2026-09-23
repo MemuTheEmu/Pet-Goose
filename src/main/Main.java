@@ -1,33 +1,56 @@
 package main;
 
+import entity.Player;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.sql.SQLOutput;
 
 public class Main {
-
+    public static String gooseLeftPath, gooseLeft1Path, gooseLeft2Path, gooseRightPath, gooseRight1Path, gooseRight2Path, menu1Text1, menu1Text2;
+    public static JMenuItem menuItem1;
+    public static boolean canadian = true;
     public static void main(String[] args){
+        gooseLeftPath = "/Goose/Canadian/Canadian_Goose_Left.png";
+        gooseLeft1Path = "/Goose/Canadian/Canadian_Goose_Left_1.png";
+        gooseLeft2Path = "/Goose/Canadian/Canadian_Goose_Left_2.png";
+        gooseRightPath = "/Goose/Canadian/Canadian_Goose_Right.png";
+        gooseRight1Path = "/Goose/Canadian/Canadian_Goose_Right_1.png";
+        gooseRight2Path = "/Goose/Canadian/Canadian_Goose_Right_2.png";
         JFrame window = new JFrame();
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setExtendedState(Frame.MAXIMIZED_BOTH);
+        //window.setExtendedState(Frame.MAXIMIZED_BOTH);
         window.setAlwaysOnTop(true);
+        window.setSize(48,48);
         window.setResizable(false);
         window.setUndecorated(true);
         window.setBackground(new Color(0,0,0,0));
         //window.setTitle("GAME... IN JAVA!!?!?!?!?");
-
+        menu1Text1 = "White Goose";
+        menu1Text2 = "Canadian Goose";
         JPopupMenu popupMenu = new JPopupMenu();
-        JMenuItem menuItem1 = new JMenuItem("Option 1");
-        menuItem1.addActionListener(e -> { System.out.println("Option 1 selected"); });
+        menuItem1 = new JMenuItem(menu1Text1);
+        menuItem1.addActionListener(e -> { System.out.println("White Goose");
+            if(menuItem1.getText().equals(menu1Text1)){
+                menuItem1.setText(menu1Text2);
+                canadian = false;
+            }else if(menuItem1.getText().equals(menu1Text2)){
+                menuItem1.setText(menu1Text1);
+                canadian = true;
+            }});
+
         popupMenu.add(menuItem1);
 
         JMenuItem menuItem2 = new JMenuItem("Option 2");
-        menuItem2.addActionListener(e -> { System.out.println("Option 2 selected"); });
+        menuItem2.addActionListener(e -> { System.out.println("Option 2 selected");
+
+
+
+        });
         popupMenu.add(menuItem2);
 
-        GamePanel gamePanel = new GamePanel();
+        GamePanel gamePanel = new GamePanel(window);
 
         window.add(gamePanel);
         window.pack();//makes everything fit
@@ -43,7 +66,7 @@ public class Main {
                 //if(e.isPopupTrigger()){
                     popupMenu.show(e.getComponent(),e.getX(),e.getY()-100);
                 //}
-                System.out.println("Click");
+                //System.out.println("Click");
             }
 
             @Override
@@ -66,5 +89,22 @@ public class Main {
 
             }
         });
+    }
+    public static void setGoose(boolean canadian){
+        if(canadian){
+            gooseLeftPath = "/Goose/Canadian/Canadian_Goose_Left.png";
+            gooseLeft1Path = "/Goose/Canadian/Canadian_Goose_Left_1.png";
+            gooseLeft2Path = "/Goose/Canadian/Canadian_Goose_Left_2.png";
+            gooseRightPath = "/Goose/Canadian/Canadian_Goose_Right.png";
+            gooseRight1Path = "/Goose/Canadian/Canadian_Goose_Right_1.png";
+            gooseRight2Path = "/Goose/Canadian/Canadian_Goose_Right_2.png";
+        }else{
+            gooseLeftPath = "/Goose/White/White_Goose_Left.png";
+            gooseLeft1Path = "/Goose/White/White_Goose_Left_1.png";
+            gooseLeft2Path = "/Goose/White/White_Goose_Left_2.png";
+            gooseRightPath = "/Goose/White/White_Goose_Right.png";
+            gooseRight1Path = "/Goose/White/White_Goose_Right_1.png";
+            gooseRight2Path = "/Goose/White/White_Goose_Right_2.png";
+        }
     }
 }

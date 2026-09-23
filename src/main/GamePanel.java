@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import static java.lang.Thread.sleep;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
@@ -21,13 +22,13 @@ public class GamePanel extends JPanel implements Runnable {
 
     //WORLD SETTINGS
 
-    int FPS = 60;
+    int FPS = 30;
 
     Thread gameThread;
     KeyHandler keyH = new KeyHandler();
-    public Player player = new Player(this, keyH);
+    public Player player;
 
-    public GamePanel(){
+    public GamePanel(JFrame window){
         this.setPreferredSize(new Dimension(1920,1080));
         //this.setBackground(Color.BLACK);
         this.setOpaque(false);
@@ -35,6 +36,9 @@ public class GamePanel extends JPanel implements Runnable {
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
+
+        player = new Player(this, keyH, window);
+
         JPopupMenu popupMenu= new JPopupMenu();
         JMenuItem menuItem1 = new JMenuItem("Item 1");
         popupMenu.add(menuItem1);
@@ -65,7 +69,6 @@ public class GamePanel extends JPanel implements Runnable {
 
 
         while(gameThread!=null){
-
             currentTime = System.nanoTime();
 
             delta+=(currentTime-lastTime) / drawInterval;
@@ -78,10 +81,15 @@ public class GamePanel extends JPanel implements Runnable {
                 delta --;
                 drawCount ++;
             }
-            if(timer >= 1000000000){
-               // System.out.println("FPS: " + drawCount);
+            if(timer >= 1000000000) {
+                // System.out.println("FPS: " + drawCount);
                 drawCount = 0;
                 timer = 0;
+            }
+            try {
+                Thread.sleep(15);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         }
     }
@@ -92,9 +100,6 @@ public class GamePanel extends JPanel implements Runnable {
 
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g;
-        removeAll();
         player.draw(g2); // second so is on top of tile
-
-        g2.dispose();
     }
 }
