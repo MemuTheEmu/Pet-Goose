@@ -7,11 +7,16 @@ on:
   workflow_dispatch:
 
 jobs:
+
+  # ============================================================
+  # WINDOWS
+  # ============================================================
   build-windows:
     name: Build Windows
     runs-on: windows-latest
 
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -27,8 +32,11 @@ jobs:
           rm -rf build
           mkdir -p build/classes
           mkdir -p build/input
+
           find src -name "*.java" > sources.txt
+
           javac -d build/classes @sources.txt
+
           cp -R res/. build/classes/
 
       - name: Create JAR
@@ -39,7 +47,7 @@ jobs:
             --main-class main.Main \
             -C build/classes .
 
-      - name: Create Windows application
+      - name: Create Windows app
         shell: bash
         run: |
           mkdir -p build/package
@@ -53,24 +61,51 @@ jobs:
             --dest build/package \
             --app-version 1.0.0 \
             --vendor "Pet Goose"
-      - name: Zip Windows application
+
+      - name: Verify Windows app
+        shell: bash
+        run: |
+          echo "=== WINDOWS APP ==="
+          ls -la build/package/Pet-Goose
+
+          echo "=== APP FOLDER ==="
+          ls -la build/package/Pet-Goose/app
+
+          echo "=== RUNTIME FOLDER ==="
+          ls -la build/package/Pet-Goose/runtime
+
+          echo "=== EXE ==="
+          ls -la build/package/Pet-Goose/Pet-Goose.exe
+
+      - name: Create Windows ZIP
         shell: bash
         run: |
           cd build/package
-          7z a ../../Pet-Goose-Windows.zip "Pet-Goose"
+          7z a -tzip ../../Pet-Goose-Windows.zip Pet-Goose
 
-      - name: Upload Windows application
+      - name: Verify Windows ZIP
+        shell: bash
+        run: |
+          echo "=== ZIP CONTENTS ==="
+          7z l Pet-Goose-Windows.zip
+
+      - name: Upload Windows ZIP
         uses: actions/upload-artifact@v4
         with:
           name: Pet-Goose-Windows
           path: Pet-Goose-Windows.zip
+          if-no-files-found: error
 
 
+  # ============================================================
+  # MACOS APPLE SILICON
+  # ============================================================
   build-macos-arm64:
     name: Build macOS Apple Silicon
     runs-on: macos-15
 
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -86,8 +121,11 @@ jobs:
           rm -rf build
           mkdir -p build/classes
           mkdir -p build/input
+
           find src -name "*.java" > sources.txt
+
           javac -d build/classes @sources.txt
+
           cp -R res/. build/classes/
 
       - name: Create JAR
@@ -113,24 +151,29 @@ jobs:
             --app-version 1.0.0 \
             --vendor "Pet Goose"
 
-      - name: Zip macOS application
+      - name: Create macOS ZIP
         shell: bash
         run: |
           cd build/package
-          zip -r ../../Pet-Goose-macOS-AppleSilicon.zip "Pet-Goose.app"
+          zip -r ../../Pet-Goose-macOS-AppleSilicon.zip Pet-Goose.app
 
-      - name: Upload macOS build
+      - name: Upload macOS application
         uses: actions/upload-artifact@v4
         with:
           name: Pet-Goose-macOS-AppleSilicon
           path: Pet-Goose-macOS-AppleSilicon.zip
+          if-no-files-found: error
 
 
+  # ============================================================
+  # MACOS INTEL
+  # ============================================================
   build-macos-intel:
     name: Build macOS Intel
     runs-on: macos-15-intel
 
     steps:
+
       - name: Checkout
         uses: actions/checkout@v4
 
@@ -146,8 +189,11 @@ jobs:
           rm -rf build
           mkdir -p build/classes
           mkdir -p build/input
+
           find src -name "*.java" > sources.txt
+
           javac -d build/classes @sources.txt
+
           cp -R res/. build/classes/
 
       - name: Create JAR
@@ -173,14 +219,15 @@ jobs:
             --app-version 1.0.0 \
             --vendor "Pet Goose"
 
-      - name: Zip macOS application
+      - name: Create macOS ZIP
         shell: bash
         run: |
           cd build/package
-          zip -r ../../Pet-Goose-macOS-Intel.zip "Pet-Goose.app"
+          zip -r ../../Pet-Goose-macOS-Intel.zip Pet-Goose.app
 
-      - name: Upload macOS build
+      - name: Upload macOS application
         uses: actions/upload-artifact@v4
         with:
           name: Pet-Goose-macOS-Intel
           path: Pet-Goose-macOS-Intel.zip
+          if-no-files-found: error
