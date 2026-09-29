@@ -1,19 +1,19 @@
 package main;
 
-import entity.Player;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseMotionListener;
 
 import static java.lang.System.exit;
 
 public class Main {
     public static String gooseLeftPath, gooseLeft1Path, gooseLeft2Path, gooseRightPath, gooseRight1Path, gooseRight2Path, menu1Text1, menu1Text2;
     public static JMenuItem menuItem1;
-    public static boolean canadian = true, holding;
-    public static int mouseX, mouseY;
+    public static boolean canadian = true, holding, dropped;
+    public static Point initialClick;
     public static void main(String[] args){
         gooseLeftPath = "/Goose/Canadian/Canadian_Goose_Left.png";
         gooseLeft1Path = "/Goose/Canadian/Canadian_Goose_Left_1.png";
@@ -54,34 +54,29 @@ public class Main {
 
         window.add(gamePanel);
         window.pack();//makes everything fit
-
-        //window.setLocationRelativeTo(null);
         window.setVisible(true);
 
         gamePanel.startGameThread();
         gamePanel.setVisible(true);
         gamePanel.addMouseListener(new MouseListener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
-                //if(e.isPopupTrigger()){
+            public void mouseClicked(MouseEvent e) { //TODO fix this
+                if(e.isPopupTrigger()){
                     popupMenu.show(e.getComponent(),e.getX(),e.getY()-100);
-                //}
-                //System.out.println("Click");
+                }
+                System.out.println("Click");
             }
-
             @Override
             public void mousePressed(MouseEvent e) {
-                mouseX = e.getX();
-                mouseY = e.getY();
                 holding = true;
-                System.out.println("X: "  + e.getX());
-                System.out.println("Y: " + e.getY());
-
+                dropped = false;
+                initialClick = e.getPoint();
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-                    holding = false;
+                holding = false;
+                dropped = true;
             }
 
             @Override
@@ -91,6 +86,22 @@ public class Main {
 
             @Override
             public void mouseExited(MouseEvent e) {
+
+            }
+        });
+        gamePanel.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                int thisX = window.getX();
+                int thisY = window.getY();
+                int xMoved = e.getX() - initialClick.x;
+                int yMoved = e.getY() - initialClick.y;
+                window.setLocation(thisX + xMoved, thisY + yMoved);
+                dropped = false;
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
 
             }
         });

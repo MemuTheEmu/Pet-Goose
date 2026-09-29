@@ -1,24 +1,17 @@
 package main;
 
-import entity.Player;
+import entity.Goose;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import static java.lang.Thread.sleep;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class GamePanel extends JPanel implements Runnable {
     final int originalTileSize = 16;
     final int scale = 3;
 
     public final int tileSize = originalTileSize * scale;
-   // public final int maxScreenCol = 16;
-   // public final int maxScreenRow = 12;
-    //public final int screenWidth = tileSize * maxScreenCol;
-   // public final int screenHeight = tileSize * maxScreenRow;
 
     //WORLD SETTINGS
 
@@ -26,18 +19,16 @@ public class GamePanel extends JPanel implements Runnable {
 
     Thread gameThread;
     KeyHandler keyH = new KeyHandler();
-    public Player player;
+    public Goose goose;
 
     public GamePanel(JFrame window){
         this.setPreferredSize(new Dimension(48,48));
-        //this.setBackground(Color.BLACK);
         this.setOpaque(false);
-        //this.setBackground(new Color(0,0,0,0));
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
         this.setFocusable(true);
 
-        player = new Player(this, keyH, window);
+        goose = new Goose(this, keyH, window);
 
         JPopupMenu popupMenu= new JPopupMenu();
         JMenuItem menuItem1 = new JMenuItem("Item 1");
@@ -94,12 +85,11 @@ public class GamePanel extends JPanel implements Runnable {
         }
     }
     public void update(){
-       player.update();
+       goose.update();
     }
     public void paintComponent(Graphics g){
-
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g;
-        player.draw(g2); // second so is on top of tile
+        goose.draw(g2);
     }
 }

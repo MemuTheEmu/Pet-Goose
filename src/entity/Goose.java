@@ -11,10 +11,9 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Random;
-import java.util.logging.Logger;
 
 
-public class Player extends Entity{
+public class Goose extends Entity{
     MouseEvent e;
     JFrame window;
     GamePanel gp;
@@ -28,7 +27,7 @@ public class Player extends Entity{
     Rectangle screenSize = screen.getDefaultConfiguration().getBounds();
     int screenWidth, screenHeight;
 
-    public Player(GamePanel gp, KeyHandler keyH, JFrame window) {
+    public Goose(GamePanel gp, KeyHandler keyH, JFrame window) {
         this.gp = gp;
         this.keyH = keyH;
         this.window = window;
@@ -83,13 +82,16 @@ public class Player extends Entity{
             lastCanadian = Main.canadian;
             getGooseSprite();
         }
-        //stealCursor(gooseX,gooseY);
-        if(holding != lastholding && holding){
-            System.out.println(Main.mouseX);
-            gooseX = e.getX();
-            gooseY = e.getY();
-            //moving = true;
+        if(Main.holding != lastholding && Main.holding){//If mouse is holding goose, stop it from moving and generating new actions
+            gooseActionTime = 0;
+            acting = true;
+            //direction = "held"; //TODO add sprite for being dragged make goose not dead after dropping and make sure goose doesn't teleport back.
+        }else if(Main.holding == lastholding && !Main.holding && Main.dropped){//Supposed to make the goose
+            acting = false;
+            System.out.println("here");
+            Main.dropped = false;
         }
+
         if (!acting) {
             gooseController = random.nextInt(50);
             gooseActionTime = random.nextInt(101) +500;
@@ -98,13 +100,11 @@ public class Player extends Entity{
                 acting = true;
                 System.out.println("Moving");
                 if (gooseController >= 25) { // Move left
-                    //System.out.println("Move: " + gooseMovement);
                     speedDirectionX = -1;
                     speedDirectionY = 0;
                     direction = "left";
                 }
                 if (gooseController < 25) { // Move right
-                    //System.out.println("Move: " + gooseMovement);
                     speedDirectionX = 1;
                     speedDirectionY = 0;
                     direction = "right";
@@ -127,22 +127,8 @@ public class Player extends Entity{
                     direction = "down";
                 }
             }
-            //System.out.println("Action: " + gooseActionTime);
-            //System.out.println("Control: " + gooseController);
-        //}else if(!sitting && nextAction){
-            //gooseActionTime = random.nextInt(101) + 100;
         }
-
-        //System.out.println(gooseController);
-
-        /*if(gooseController <= 10){
-            speedDirectionX = 0;
-            speedDirectionY = 0;
-            direction = "down";
-            moving = true;
-        }*/
         // while moving the player position and sprite is updated
-        //System.out.println("Sprite Counter: " + gooseSpriteNum);
         gooseSpriteCounter++;
         pixelCounter += speed;
         if (gooseSpriteCounter > 10) {
@@ -151,7 +137,6 @@ public class Player extends Entity{
         }
         if(sitting || sleeping){
             gooseY += speedDirectionY * speed;
-            //window.setLocation(gooseX,gooseY);
             if (pixelCounter >= gooseActionTime) {
                 pixelCounter = 0;
                 acting = false;
@@ -160,8 +145,6 @@ public class Player extends Entity{
         if(moving){
             if ((gooseX + speed + gp.tileSize) <= (screenSize.x + screenWidth) && (gooseX - speed) >= screenSize.x) {
                 gooseX += speedDirectionX * speed;
-                //window.setLocation(gooseX,gooseY);
-                //System.out.println("Goose X: " + gooseX);
             }
             else {
                 gooseX += speedDirectionX * -speed;
@@ -170,16 +153,13 @@ public class Player extends Entity{
                 moving = false;
                 acting =false;
             }
-            //System.out.println("Moving");
             if (pixelCounter >= gooseActionTime) {
-                //System.out.println("Pixel: " + pixelCounter);
                 moving = false;
                 pixelCounter = 0;
                 acting = false;
             }
             window.setLocation(gooseX, gooseY);
         }
-
     }
 
     public void draw(Graphics2D g2) {
@@ -228,7 +208,7 @@ public class Player extends Entity{
             Robot robot = new Robot();
             robot.mouseMove(gooseX, gooseY);
         }catch(AWTException e) {
-
+            e.printStackTrace();
         }
     }
 }
