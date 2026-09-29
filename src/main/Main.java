@@ -55,7 +55,7 @@ public class Main {
         window.add(gamePanel);
         window.pack();//makes everything fit
 
-        window.setLocationRelativeTo(null);
+        //window.setLocationRelativeTo(null);
         window.setVisible(true);
 
         gamePanel.startGameThread();
@@ -71,6 +71,11 @@ public class Main {
 
             @Override
             public void mousePressed(MouseEvent e) {
+                mouseX = e.getX();
+                mouseY = e.getY();
+                holding = true;
+                System.out.println("X: "  + e.getX());
+                System.out.println("Y: " + e.getY());
 
             }
 
@@ -81,11 +86,7 @@ public class Main {
 
             @Override
             public void mouseEntered(MouseEvent e) {
-                mouseX = e.getX();
-                mouseY = e.getY();
-                holding = true;
-                System.out.println("X: "  + e.getX());
-                System.out.println("Y: " + e.getY());
+
             }
 
             @Override

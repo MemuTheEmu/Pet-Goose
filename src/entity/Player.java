@@ -41,7 +41,7 @@ public class Player extends Entity{
         screenHeight = (int) screenSize.getHeight();//Gets screen width
         gooseX = screenWidth - 960; //The location of the player on the x-axis
         gooseY = screenHeight - 200; //The location of the player on the y-axis
-        //window.setLocation(gooseX, gooseY);
+        window.setLocation(gooseX, gooseY);
         //window.setVisible(true);
         speed = 4; //Speed of the players movements
         //Speed of the players movements while sprinting
@@ -91,8 +91,8 @@ public class Player extends Entity{
             //moving = true;
         }
         if (!acting) {
-            gooseController = random.nextInt(101)+51;
-            gooseActionTime = random.nextInt(101) + 500;
+            gooseController = random.nextInt(50);
+            gooseActionTime = random.nextInt(101) +500;
             if(gooseController <= 50){
                 moving = true;
                 acting = true;
@@ -129,9 +129,9 @@ public class Player extends Entity{
             }
             //System.out.println("Action: " + gooseActionTime);
             //System.out.println("Control: " + gooseController);
-        }/*else if(!sitting && nextAction){
-            gooseActionTime = random.nextInt(101) + 100;
-        }*/
+        //}else if(!sitting && nextAction){
+            //gooseActionTime = random.nextInt(101) + 100;
+        }
 
         //System.out.println(gooseController);
 
@@ -177,8 +177,9 @@ public class Player extends Entity{
                 pixelCounter = 0;
                 acting = false;
             }
+            window.setLocation(gooseX, gooseY);
         }
-        window.setLocation(gooseX, gooseY);
+
     }
 
     public void draw(Graphics2D g2) {
