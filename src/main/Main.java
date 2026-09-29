@@ -7,10 +7,13 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+import static java.lang.System.exit;
+
 public class Main {
     public static String gooseLeftPath, gooseLeft1Path, gooseLeft2Path, gooseRightPath, gooseRight1Path, gooseRight2Path, menu1Text1, menu1Text2;
     public static JMenuItem menuItem1;
-    public static boolean canadian = true;
+    public static boolean canadian = true, holding;
+    public static int mouseX, mouseY;
     public static void main(String[] args){
         gooseLeftPath = "/Goose/Canadian/Canadian_Goose_Left.png";
         gooseLeft1Path = "/Goose/Canadian/Canadian_Goose_Left_1.png";
@@ -22,7 +25,6 @@ public class Main {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //window.setExtendedState(Frame.MAXIMIZED_BOTH);
         window.setAlwaysOnTop(true);
-        window.setSize(48,48);
         window.setResizable(false);
         window.setUndecorated(true);
         window.setBackground(new Color(0,0,0,0));
@@ -42,11 +44,9 @@ public class Main {
 
         popupMenu.add(menuItem1);
 
-        JMenuItem menuItem2 = new JMenuItem("Option 2");
+        JMenuItem menuItem2 = new JMenuItem("Exit");
         menuItem2.addActionListener(e -> { System.out.println("Option 2 selected");
-
-
-
+            exit(0);
         });
         popupMenu.add(menuItem2);
 
@@ -76,12 +76,16 @@ public class Main {
 
             @Override
             public void mouseReleased(MouseEvent e) {
-
+                    holding = false;
             }
 
             @Override
             public void mouseEntered(MouseEvent e) {
-
+                mouseX = e.getX();
+                mouseY = e.getY();
+                holding = true;
+                System.out.println("X: "  + e.getX());
+                System.out.println("Y: " + e.getY());
             }
 
             @Override
