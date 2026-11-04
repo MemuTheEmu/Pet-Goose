@@ -14,6 +14,7 @@ public class Main {
     public static JMenuItem menuItem1;
     public static boolean canadian = true, holding, dropped;
     public static Point initialClick;
+    public static int xMoved, yMoved;
     public static void main(String[] args){
         gooseLeftPath = "/Goose/Canadian/Canadian_Goose_Left.png";
         gooseLeft1Path = "/Goose/Canadian/Canadian_Goose_Left_1.png";
@@ -61,20 +62,28 @@ public class Main {
         gamePanel.addMouseListener(new MouseListener() {
             @Override
             public void mouseClicked(MouseEvent e) { //TODO fix this
-                if(e.isPopupTrigger()){
-                    popupMenu.show(e.getComponent(),e.getX(),e.getY()-100);
-                }
+
                 System.out.println("Click");
             }
             @Override
             public void mousePressed(MouseEvent e) {
-                holding = true;
-                dropped = false;
-                initialClick = e.getPoint();
+                if(e.isPopupTrigger()){
+                    popupMenu.show(e.getComponent(),e.getX(),e.getY()-100);
+                    return;
+                }
+                if(SwingUtilities.isLeftMouseButton(e)){
+                    holding = true;
+                    dropped = false;
+                    initialClick = e.getPoint();
+                }
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
+                if (e.isPopupTrigger()) {
+                    popupMenu.show(e.getComponent(), e.getX(), e.getY());
+                    return;
+                }
                 holding = false;
                 dropped = true;
             }
@@ -94,10 +103,13 @@ public class Main {
             public void mouseDragged(MouseEvent e) {
                 int thisX = window.getX();
                 int thisY = window.getY();
-                int xMoved = e.getX() - initialClick.x;
-                int yMoved = e.getY() - initialClick.y;
-                window.setLocation(thisX + xMoved, thisY + yMoved);
-                dropped = false;
+                if(holding && initialClick != null){
+                    xMoved = e.getX() - initialClick.x;
+                    yMoved = e.getY() - initialClick.y;
+                    window.setLocation(thisX + xMoved, thisY + yMoved);
+                }
+
+                //dropped = false;
             }
 
             @Override

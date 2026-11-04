@@ -77,6 +77,9 @@ public class Goose extends Entity{
 
 
     public void update() {// TODO Create Sleep, Sit, Drag and Drop, Work on AI, Steal Cursor, Make sure windows+d does not minimize.
+        gooseX = window.getX();
+        gooseY = window.getY();
+
         if(Main.canadian != lastCanadian){
             Main.setGoose(Main.canadian);
             lastCanadian = Main.canadian;
