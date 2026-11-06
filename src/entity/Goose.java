@@ -11,7 +11,6 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 
 public class Goose extends Entity{
@@ -19,10 +18,10 @@ public class Goose extends Entity{
     JFrame window;
     GamePanel gp;
     KeyHandler keyH;
-    boolean moving, lastCanadian = Main.canadian, sitting, lastholding = Main.holding, holding, acting, sleeping;
+    boolean moving, lastCanadian = Main.canadian, sitting, lastholding = Main.holding, holding, acting, sleeping, idling;
     int pixelCounter,moveChance, sleepChance, sitChance, stealChance;
     Random random = new Random();
-    int gooseController = -1, gooseActionTime;
+    int gooseController = -1, gooseActionTime, pauseTime;
     GraphicsDevice screen = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
 
     Rectangle screenSize = screen.getDefaultConfiguration().getBounds();
@@ -51,6 +50,7 @@ public class Goose extends Entity{
         pixelCounter = 0;
         sitting = false;
         moveChance = 50;
+        idling  = false;
         sleepChance = moveChance + 50;
         sitChance = sleepChance + 50;
     }
@@ -69,8 +69,10 @@ public class Goose extends Entity{
             gooseSleepDown3 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Goose/Classic/Goose_Sleep_Down_3.png")));
             gooseUp1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Goose/Classic/Goose_Up_1.png")));
             gooseUp2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Goose/Classic/Goose_Up_2.png")));
+            gooseRight = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.gooseRightPath)));
             gooseRight1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.gooseRight1Path)));
             gooseRight2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.gooseRight2Path)));
+            gooseLeft = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.gooseLeftPath)));
             gooseLeft1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.gooseLeft1Path)));
             gooseLeft2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.gooseLeft2Path)));
             testSprite1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.testSprite1Path)));
@@ -84,11 +86,8 @@ public class Goose extends Entity{
     }
 
 
-    public void update() {// TODO Create Sleep, Sit, Work on AI, Steal Cursor, Make sure windows+d does not minimize.
-
-        //move should be slower, add random number to control sleep, sit, move and steal cursor.
+    public void update() {// TODO Create Work on AI, Steal Cursor
         //Steal cursor should only activate when cursor is within a certain distance from the goose, it should also only activate while moving.
-        //
         if(targetTime > System.currentTimeMillis()){
             return;
         }
@@ -108,18 +107,15 @@ public class Goose extends Entity{
         }else if(gooseController <= sitChance){
             sitter();
         }else{
-            idle();
+            idler();
         }
         if(moving){
             mover();
         }
         isGrabbed();
-
-
-        /*moving = false;
-        direction = "sleep down";*/
-        spriteRenderer(); //TODO figure out why spriteRenderer needs to be called twice for movement sprites to work
-
+        if(idling){
+            idler();
+        }
     }
 
     public void draw(Graphics2D g2) {
@@ -141,13 +137,13 @@ public class Goose extends Entity{
                 image = gooseStationaryUp;
                 break;
             case "stationary right":
-                image = gooseStationaryRight;
+                image = gooseRight;
                 break;
             case "stationary down":
                 image = gooseStationaryDown;
                 break;
             case "stationary left":
-                image = gooseStationaryLeft;
+                image = gooseLeft;
                 break;
             case "sleep down":
                 if(gooseSpriteNum == 1){
@@ -162,7 +158,8 @@ public class Goose extends Entity{
                 image = testSprite1;
                 break;
             case "left grabbed":
-                image = testSprite2;
+                image = testSprite2; //TODO add case for all the new sprites.
+                break;
         }
         g2.drawImage(image, 0, 0, gp.tileSize, gp.tileSize, null); //draws the player sprite at the location and size denoted by playerX/Y and gp.tileSize
     }
@@ -175,10 +172,10 @@ public class Goose extends Entity{
         }
     }
     public void mover(){
+        idling = false;
         moving = true;
-        if(!direction.equals(lastDirection)){ //TODO make pause have a random time between 1 and 4, make goose turn after pause;
-            pause(1);
-        }
+
+         //TODO make pause have a random time between 1 and 4, make goose turn after pause;
         if ((gooseX + speed + gp.tileSize) <= (screenSize.x + screenWidth) && (gooseX - speed) >= screenSize.x) { //If the movement speed + position of goose is between screen size
             gooseX += speedDirectionX * speed;
         }else {
@@ -192,18 +189,45 @@ public class Goose extends Entity{
             moving = false;
             pixelCounter = 0;
             acting = false;
+            pauseTime = random.nextInt(4)+1;
+            if(direction.equals("right")){
+                direction = "stationary right";
+                pause(pauseTime);
+            } else if (direction.equals("left")) {
+                direction = "stationary left";
+                pause(pauseTime);
+            }
         }
-        lastDirection = direction;
         spriteRenderer();
+        lastDirection = direction;
         window.setLocation(gooseX, gooseY);
     }
     public void sleeper(){
-
+        gooseController = random.nextInt(100);
+        if(gooseController <= 50 ){
+            direction = "right grabbed"; //TODO make these sleeping animations
+        }else if(gooseController <= 90){
+            direction = "left grabbed";
+        }else{
+            direction = "left grabbed";
+        }
+        pauseTime = random.nextInt(10)+15;
+        pause(pauseTime);
     }
     public void sitter(){
-
+        gooseController = random.nextInt(100);
+        if(gooseController <= 50 ){
+            direction = "right grabbed"; //TODO make these sitting animations
+        }else if(gooseController <= 90){
+            direction = "left grabbed";
+        }else{
+            direction = "left grabbed";
+        }
+        pauseTime = random.nextInt(20)+ 15;
+        pause(pauseTime);
     }
     public void isGrabbed(){
+        idling = false;
         if(Main.canadian != lastCanadian){
             Main.setGoose(Main.canadian);
             lastCanadian = Main.canadian;
@@ -226,12 +250,12 @@ public class Goose extends Entity{
 
     }
     public void spriteRenderer(){
+        idling = false;
         if(moving){ // while moving the goose position and sprite is updated
             gooseSpriteCounter++;
-            if (gooseSpriteCounter > 30) {
+            if (gooseSpriteCounter > 10) {
                 gooseSpriteNum = (gooseSpriteNum == 1) ? 2 : 1;
                 gooseSpriteCounter = 0;
-
             }
         }else{
             gooseSpriteCounter++;
@@ -261,8 +285,17 @@ public class Goose extends Entity{
             direction = "right";
         }
     }
-    public void idle(){
-
+    public void idler(){
+        gooseController = random.nextInt(100);
+        if(gooseController <= 50 ){
+            direction = "right grabbed"; //TODO make these idling animations
+        }else if(gooseController <= 90){
+            direction = "left grabbed";
+        }else{
+            direction = "left grabbed";
+        }
+        pauseTime = random.nextInt(20)+20;
+        pause(pauseTime);
     }
     public void pause(long seconds){
         targetTime = System.currentTimeMillis() + (seconds * 1000);
