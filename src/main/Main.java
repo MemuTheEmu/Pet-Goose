@@ -10,7 +10,10 @@ import java.awt.event.MouseMotionListener;
 import static java.lang.System.exit;
 
 public class Main {
-    public static String gooseLeftPath, gooseLeft1Path, gooseLeft2Path, gooseRightPath, gooseRight1Path, gooseRight2Path, menu1Text1, menu1Text2;
+    public static String gooseLeftPath, gooseLeft1Path,
+            gooseLeft2Path, gooseRightPath, gooseRight1Path,
+            gooseRight2Path, menu1Text1, menu1Text2,
+            testSprite1Path,testSprite2Path,testSprite3Path;
     public static JMenuItem menuItem1;
     public static boolean canadian = true, holding, dropped;
     public static Point initialClick;
@@ -22,6 +25,10 @@ public class Main {
         gooseRightPath = "/Goose/Canadian/Canadian_Goose_Right.png";
         gooseRight1Path = "/Goose/Canadian/Canadian_Goose_Right_1.png";
         gooseRight2Path = "/Goose/Canadian/Canadian_Goose_Right_2.png";
+        testSprite1Path = "/Goose/Tests/TestSprite_1.png";
+        testSprite2Path = "/Goose/Tests/TestSprite_2.png";
+        testSprite3Path = "/Goose/Tests/TestSprite_3.png";
+
         JFrame window = new JFrame();
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         //window.setExtendedState(Frame.MAXIMIZED_BOTH);

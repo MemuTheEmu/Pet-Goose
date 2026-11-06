@@ -19,7 +19,7 @@ public class Goose extends Entity{
     GamePanel gp;
     KeyHandler keyH;
     boolean moving, lastCanadian = Main.canadian, sitting, lastholding = Main.holding, holding, acting, sleeping;
-    int pixelCounter;
+    int pixelCounter,moveChance, sleepChance, sitChance, stealChance;
     Random random = new Random();
     int gooseController = -1, gooseActionTime;
     GraphicsDevice screen = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -48,6 +48,9 @@ public class Goose extends Entity{
         // Whether the player is moving
         pixelCounter = 0;
         sitting = false;
+        moveChance = 50;
+        sleepChance = moveChance + 50;
+        sitChance = sleepChance + 50;
     }
 
 
@@ -68,6 +71,9 @@ public class Goose extends Entity{
             gooseRight2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.gooseRight2Path)));
             gooseLeft1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.gooseLeft1Path)));
             gooseLeft2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.gooseLeft2Path)));
+            testSprite1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.testSprite1Path)));
+            testSprite2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.testSprite2Path)));
+            testSprite3 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.testSprite3Path)));
 
 
         } catch (IOException e) {
@@ -77,89 +83,39 @@ public class Goose extends Entity{
 
 
     public void update() {// TODO Create Sleep, Sit, Work on AI, Steal Cursor, Make sure windows+d does not minimize.
+
+        //move should be slower, add random number to control sleep, sit, move and steal cursor.
+        //Steal cursor should only activate when cursor is within a certain distance from the goose, it should also only activate while moving.
+        //
+
         gooseX = window.getX();
         gooseY = window.getY();
-
-        if(Main.canadian != lastCanadian){
-            Main.setGoose(Main.canadian);
-            lastCanadian = Main.canadian;
-            getGooseSprite();
-        }
-        if(Main.holding != lastholding && Main.holding){//If mouse is holding goose, stop it from moving and generating new actions
-            gooseActionTime = 0;
-            acting = true;
-            //direction = "held"; //TODO add sprite for being dragged
-        }else if(Main.holding == lastholding && !Main.holding && Main.dropped){//Supposed to make the goose
-            acting = false;
-            System.out.println("here");
-            Main.dropped = false;
-        }
-
         if (!acting) {
+            acting = true;
+            moving = true;
             gooseController = random.nextInt(50);
             gooseActionTime = random.nextInt(101);
-            if(gooseController <= 50){
-                moving = true;
-                acting = true;
-                System.out.println("Moving");
-                if (gooseController >= 25) { // Move left
-                    speedDirectionX = -1;
-                    speedDirectionY = 0;
-                    direction = "left";
-                }
-                if (gooseController < 25) { // Move right
-                    speedDirectionX = 1;
-                    speedDirectionY = 0;
-                    direction = "right";
-                }
-            }
-            if(gooseController > 50){
-                acting = true;
-                if(gooseController > 400){
-                    System.out.println("Sitting");
-                    sitting = true;
-                    speedDirectionY = -1;
-                    speedDirectionX = 0;
-                    direction = "up";
-                }
-                if (gooseController > 500){
-                    System.out.println("Sleeping");
-                    sleeping = true;
-                    speedDirectionY = 1;
-                    speedDirectionX = 0;
-                    direction = "down";
-                }
-            }
-        }
-        moving = false;
-        pixelCounter += speed;
-        spriteRenderer();
-        direction = "sleep down";
 
-        if(sitting || sleeping){
-            gooseY += speedDirectionY * speed;
-            if (pixelCounter >= gooseActionTime) {
-                pixelCounter = 0;
-                acting = false;
-            }
+        }
+        if(gooseController <= moveChance){
+            setDirection();
+        }else if(gooseController <= sleepChance){
+            sleeper();
+        }else if(gooseController <= sitChance){
+            sitter();
+        }else{
+
         }
         if(moving){
-            if ((gooseX + speed + gp.tileSize) <= (screenSize.x + screenWidth) && (gooseX - speed) >= screenSize.x) { //If the movement speed + position of goose is between screen size
-                gooseX += speedDirectionX * speed;
-            }
-            else {
-                gooseX += -speedDirectionX * speed; // If not within screen limits move toward center for 1 tick and stop                //direction = "stationary " + direction;
-                gooseActionTime = 0;
-                moving = false;
-                acting =false;
-            }
-            if (pixelCounter >= gooseActionTime) {// stops from moving if it has been moved the random amount
-                moving = false;
-                pixelCounter = 0;
-                acting = false;
-            }
-            window.setLocation(gooseX, gooseY);
+            mover();
         }
+        isGrabbed();
+
+
+        /*moving = false;
+        direction = "sleep down";*/
+        spriteRenderer(); //TODO figure out why spriteRenderer needs to be called twice for movement sprites to work
+
     }
 
     public void draw(Graphics2D g2) {
@@ -198,8 +154,13 @@ public class Goose extends Entity{
                     image = gooseSleepDown3;
                 }
                 break;
+            case "right grabbed":
+                image = testSprite1;
+                break;
+            case "left grabbed":
+                image = testSprite2;
         }
-        g2.drawImage(image, 0/*gooseX*/, /*gooseY*/ 0, gp.tileSize, gp.tileSize, null); //draws the player sprite at the location and size denoted by playerX/Y and gp.tileSize
+        g2.drawImage(image, 0, 0, gp.tileSize, gp.tileSize, null); //draws the player sprite at the location and size denoted by playerX/Y and gp.tileSize
     }
     public void stealCursor(int gooseX, int gooseY){
         try{
@@ -209,29 +170,61 @@ public class Goose extends Entity{
             e.printStackTrace();
         }
     }
-    public static void move(){
-
-    }
-    public static void sleep(int sleepTimer, String sprite){
-
-        if(sleepTimer <= 0){
-
+    public void mover(){
+        moving = true;
+        spriteRenderer();
+        if ((gooseX + speed + gp.tileSize) <= (screenSize.x + screenWidth) && (gooseX - speed) >= screenSize.x) { //If the movement speed + position of goose is between screen size
+            gooseX += speedDirectionX * speed;
+        }else {
+            gooseX += -speedDirectionX * speed; // If not within screen limits move toward center for 1 tick and stop                //direction = "stationary " + direction;
+            gooseActionTime = 0;
+            moving = false;
+            acting = false;
         }
+        pixelCounter += speed;
+        if (pixelCounter >= gooseActionTime) {// stops from moving if it has been moved the random amount
+            moving = false;
+            pixelCounter = 0;
+            acting = false;
+        }
+
+        window.setLocation(gooseX, gooseY);
     }
-    public static void sit(){
+    public void sleeper(){
 
     }
-    public static void grabbed(){
+    public void sitter(){
+
+    }
+    public void isGrabbed(){
+        if(Main.canadian != lastCanadian){
+            Main.setGoose(Main.canadian);
+            lastCanadian = Main.canadian;
+            getGooseSprite();
+        }
+        if(Main.holding != lastholding && Main.holding){//If mouse is holding goose, stop it from moving and generating new actions
+            gooseActionTime = 0;
+            acting = true;
+            moving  = false;
+            if(direction.equals("right")){ //TODO make sprite for grabbing left and right
+                direction = "right grabbed";
+            } else if (direction.equals("left")) {
+                direction = "left grabbed";
+            }
+        }else if(Main.holding == lastholding && !Main.holding && Main.dropped){//Supposed to make the goose
+            acting = false;
+            moving = false;
+            Main.dropped = false;
+        }
 
     }
     public void spriteRenderer(){
-        // while moving the goose position and sprite is updated
-
-        if(moving){
+        if(moving){ // while moving the goose position and sprite is updated
+            gooseSpriteCounter++;
             if (gooseSpriteCounter > 10) {
                 gooseSpriteNum = (gooseSpriteNum == 1) ? 2 : 1;
                 gooseSpriteCounter = 0;
-                gooseSpriteCounter++;
+
             }
         }else{
             gooseSpriteCounter++;
@@ -246,7 +239,19 @@ public class Goose extends Entity{
                 gooseSpriteCounter = 0;
             }
         }
-        System.out.println("Goose sprite counter: "+ gooseSpriteCounter);
-        System.out.println("Goose sprite num: " + gooseSpriteNum);
+        //System.out.println("Goose sprite counter: "+ gooseSpriteCounter);
+        //System.out.println("Goose sprite num: " + gooseSpriteNum);
+    }
+    public void setDirection(){
+        if (gooseController >= 25) { // Move left
+            speedDirectionX = -1;
+            speedDirectionY = 0;
+            direction = "left";
+        }
+        if (gooseController < 25) { // Move right
+            speedDirectionX = 1;
+            speedDirectionY = 0;
+            direction = "right";
+        }
     }
 }
