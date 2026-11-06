@@ -11,6 +11,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.Objects;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 
 public class Goose extends Entity{
@@ -42,9 +43,10 @@ public class Goose extends Entity{
         gooseY = screenHeight - 200; //The location of the player on the y-axis
         window.setLocation(gooseX, gooseY);
         //window.setVisible(true);
-        speed = 4; //Speed of the players movements
+        speed = 2; //Speed of the players movements
         //Speed of the players movements while sprinting
         direction = "down"; //Direction the player is facing, is down on start
+        lastDirection  = "right";
         // Whether the player is moving
         pixelCounter = 0;
         sitting = false;
@@ -87,14 +89,16 @@ public class Goose extends Entity{
         //move should be slower, add random number to control sleep, sit, move and steal cursor.
         //Steal cursor should only activate when cursor is within a certain distance from the goose, it should also only activate while moving.
         //
-
+        if(targetTime > System.currentTimeMillis()){
+            return;
+        }
         gooseX = window.getX();
         gooseY = window.getY();
         if (!acting) {
             acting = true;
             moving = true;
             gooseController = random.nextInt(50);
-            gooseActionTime = random.nextInt(101);
+            gooseActionTime = random.nextInt(101) + 50;
 
         }
         if(gooseController <= moveChance){
@@ -104,7 +108,7 @@ public class Goose extends Entity{
         }else if(gooseController <= sitChance){
             sitter();
         }else{
-
+            idle();
         }
         if(moving){
             mover();
@@ -172,7 +176,9 @@ public class Goose extends Entity{
     }
     public void mover(){
         moving = true;
-        spriteRenderer();
+        if(!direction.equals(lastDirection)){ //TODO make pause have a random time between 1 and 4, make goose turn after pause;
+            pause(1);
+        }
         if ((gooseX + speed + gp.tileSize) <= (screenSize.x + screenWidth) && (gooseX - speed) >= screenSize.x) { //If the movement speed + position of goose is between screen size
             gooseX += speedDirectionX * speed;
         }else {
@@ -187,7 +193,8 @@ public class Goose extends Entity{
             pixelCounter = 0;
             acting = false;
         }
-
+        lastDirection = direction;
+        spriteRenderer();
         window.setLocation(gooseX, gooseY);
     }
     public void sleeper(){
@@ -221,7 +228,7 @@ public class Goose extends Entity{
     public void spriteRenderer(){
         if(moving){ // while moving the goose position and sprite is updated
             gooseSpriteCounter++;
-            if (gooseSpriteCounter > 10) {
+            if (gooseSpriteCounter > 30) {
                 gooseSpriteNum = (gooseSpriteNum == 1) ? 2 : 1;
                 gooseSpriteCounter = 0;
 
@@ -253,5 +260,11 @@ public class Goose extends Entity{
             speedDirectionY = 0;
             direction = "right";
         }
+    }
+    public void idle(){
+
+    }
+    public void pause(long seconds){
+        targetTime = System.currentTimeMillis() + (seconds * 1000);
     }
 }
