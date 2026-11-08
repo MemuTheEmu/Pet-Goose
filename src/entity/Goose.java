@@ -18,8 +18,8 @@ public class Goose extends Entity{
     JFrame window;
     GamePanel gp;
     KeyHandler keyH;
-    boolean moving, lastCanadian = Main.canadian, sitting, lastholding = Main.holding, holding, acting, sleeping, idling;
-    int pixelCounter,moveChance, sleepChance, sitChance, stealChance;
+    boolean moving, lastCanadian = Main.canadian, sitting, lastholding = Main.holding, holding, acting, sleeping, idling, grabbed;
+    int pixelCounter,moveChance, sleepChance, sitChance, stealChance, idleChance;
     Random random = new Random();
     int gooseController = -1, gooseActionTime, pauseTime;
     GraphicsDevice screen = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
@@ -34,7 +34,6 @@ public class Goose extends Entity{
         setDefaultValues();
         getGooseSprite();
     }
-
     public void setDefaultValues() {
         screenWidth = (int) screenSize.getWidth();
         screenHeight = (int) screenSize.getHeight();//Gets screen width
@@ -53,22 +52,21 @@ public class Goose extends Entity{
         idling  = false;
         sleepChance = moveChance + 50;
         sitChance = sleepChance + 50;
+        grabbed = false;
     }
-
-
     public void getGooseSprite() {
         try {
-            gooseDown1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Goose/Classic/Goose_Down_1.png")));
-            gooseDown2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Goose/Classic/Goose_Down_2.png")));
-            gooseStationaryUp = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Goose/Classic/Goose_Up.png")));
+            gooseDown1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/GooseSprites/Classic/Goose_Down_1.png")));
+            gooseDown2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/GooseSprites/Classic/Goose_Down_2.png")));
+            gooseStationaryUp = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/GooseSprites/Classic/Goose_Up.png")));
             gooseStationaryRight = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.gooseRightPath)));
-            gooseStationaryDown = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Goose/Classic/Goose_Down.png")));
+            gooseStationaryDown = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/GooseSprites/Classic/Goose_Down.png")));
             gooseStationaryLeft = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.gooseLeftPath)));
-            gooseSleepDown1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Goose/Classic/Goose_Sleep_Down_1.png")));
-            gooseSleepDown2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Goose/Classic/Goose_Sleep_Down_2.png")));
-            gooseSleepDown3 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Goose/Classic/Goose_Sleep_Down_3.png")));
-            gooseUp1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Goose/Classic/Goose_Up_1.png")));
-            gooseUp2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/Goose/Classic/Goose_Up_2.png")));
+            gooseSleepDown1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/GooseSprites/Classic/Goose_Sleep_Down_1.png")));
+            gooseSleepDown2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/GooseSprites/Classic/Goose_Sleep_Down_2.png")));
+            gooseSleepDown3 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/GooseSprites/Classic/Goose_Sleep_Down_3.png")));
+            gooseUp1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/GooseSprites/Classic/Goose_Up_1.png")));
+            gooseUp2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream("/GooseSprites/Classic/Goose_Up_2.png")));
             gooseRight = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.gooseRightPath)));
             gooseRight1 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.gooseRight1Path)));
             gooseRight2 = ImageIO.read(Objects.requireNonNull(getClass().getResourceAsStream(Main.gooseRight2Path)));
@@ -84,35 +82,43 @@ public class Goose extends Entity{
             e.printStackTrace();
         }
     }
-
-
     public void update() {// TODO Create Work on AI, Steal Cursor
         //Steal cursor should only activate when cursor is within a certain distance from the goose, it should also only activate while moving.
+        isGrabbed();
         if(targetTime > System.currentTimeMillis()){
             return;
+        }
+        if(Main.canadian != lastCanadian){
+            Main.setGoose(Main.canadian);
+            lastCanadian = Main.canadian;
+            getGooseSprite();
         }
         gooseX = window.getX();
         gooseY = window.getY();
         if (!acting) {
             acting = true;
             moving = true;
-            gooseController = random.nextInt(50);
+            gooseController = random.nextInt(moveChance + sleepChance + sitChance + idleChance);
             gooseActionTime = random.nextInt(101) + 50;
 
         }
         if(gooseController <= moveChance){
             setDirection();
+            System.out.println("Moving");
         }else if(gooseController <= sleepChance){
             sleeper();
+            System.out.println("Sleeping");
         }else if(gooseController <= sitChance){
             sitter();
-        }else{
+            System.out.println("Sitting");
+        }else if(gooseController <= idleChance){
             idler();
+            System.out.println("Idling");
         }
         if(moving){
             mover();
         }
-        isGrabbed();
+
         if(idling){
             idler();
         }
@@ -174,15 +180,21 @@ public class Goose extends Entity{
     public void mover(){
         idling = false;
         moving = true;
-
-         //TODO make pause have a random time between 1 and 4, make goose turn after pause;
         if ((gooseX + speed + gp.tileSize) <= (screenSize.x + screenWidth) && (gooseX - speed) >= screenSize.x) { //If the movement speed + position of goose is between screen size
             gooseX += speedDirectionX * speed;
         }else {
-            gooseX += -speedDirectionX * speed; // If not within screen limits move toward center for 1 tick and stop                //direction = "stationary " + direction;
-            gooseActionTime = 0;
-            moving = false;
-            acting = false;
+            if(direction.equals("right")){
+                direction = "left";
+                speedDirectionX = -1;
+            }else if(direction.equals("left")){
+                direction = "right";
+                speedDirectionX = 1;
+            }
+
+            //gooseX += speedDirectionX * speed; // If not within screen limits move toward center for 1 tick and stop                //direction = "stationary " + direction;
+            gooseActionTime += 100;
+            //moving = false;
+            //acting = false;
         }
         pixelCounter += speed;
         if (pixelCounter >= gooseActionTime) {// stops from moving if it has been moved the random amount
@@ -228,15 +240,11 @@ public class Goose extends Entity{
     }
     public void isGrabbed(){
         idling = false;
-        if(Main.canadian != lastCanadian){
-            Main.setGoose(Main.canadian);
-            lastCanadian = Main.canadian;
-            getGooseSprite();
-        }
         if(Main.holding != lastholding && Main.holding){//If mouse is holding goose, stop it from moving and generating new actions
             gooseActionTime = 0;
             acting = true;
             moving  = false;
+            //grabbed = true;
             if(direction.equals("right")){ //TODO make sprite for grabbing left and right
                 direction = "right grabbed";
             } else if (direction.equals("left")) {
@@ -246,8 +254,9 @@ public class Goose extends Entity{
             acting = false;
             moving = false;
             Main.dropped = false;
+            //grabbed = false;
         }
-
+        spriteRenderer();
     }
     public void spriteRenderer(){
         idling = false;
