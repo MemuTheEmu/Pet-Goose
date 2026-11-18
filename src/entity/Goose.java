@@ -85,6 +85,7 @@ public class Goose extends Entity{
     public void update() {// TODO Create Work on AI, Steal Cursor
         //Steal cursor should only activate when cursor is within a certain distance from the goose, it should also only activate while moving.
         isGrabbed();
+        spriteRenderer();
         if(targetTime > System.currentTimeMillis()){
             return;
         }
@@ -98,7 +99,7 @@ public class Goose extends Entity{
         if (!acting) {
             acting = true;
             moving = true;
-            gooseController = random.nextInt(moveChance + sleepChance + sitChance + idleChance);
+            gooseController = random.nextInt(/*moveChance + sleepChance + sitChance + idleChance*/ 50);
             gooseActionTime = random.nextInt(101) + 50;
 
         }
@@ -183,6 +184,7 @@ public class Goose extends Entity{
         if ((gooseX + speed + gp.tileSize) <= (screenSize.x + screenWidth) && (gooseX - speed) >= screenSize.x) { //If the movement speed + position of goose is between screen size
             gooseX += speedDirectionX * speed;
         }else {
+            /*
             if(direction.equals("right")){
                 direction = "left";
                 speedDirectionX = -1;
@@ -190,11 +192,11 @@ public class Goose extends Entity{
                 direction = "right";
                 speedDirectionX = 1;
             }
-
-            //gooseX += speedDirectionX * speed; // If not within screen limits move toward center for 1 tick and stop                //direction = "stationary " + direction;
-            gooseActionTime += 100;
-            //moving = false;
-            //acting = false;
+            */
+            gooseX += -speedDirectionX * speed; // If not within screen limits move toward center for 1 tick and stop
+            gooseActionTime = 0;
+            moving = false;
+            acting = false;
         }
         pixelCounter += speed;
         if (pixelCounter >= gooseActionTime) {// stops from moving if it has been moved the random amount
@@ -243,24 +245,25 @@ public class Goose extends Entity{
         if(Main.holding != lastholding && Main.holding){//If mouse is holding goose, stop it from moving and generating new actions
             gooseActionTime = 0;
             acting = true;
-            moving  = false;
-            //grabbed = true;
-            if(direction.equals("right")){ //TODO make sprite for grabbing left and right
+            if(direction.contains("right")){ //TODO make sprite for grabbing left and right
                 direction = "right grabbed";
-            } else if (direction.equals("left")) {
+            } else if (direction.contains("left")) {
                 direction = "left grabbed";
             }
+            //grabbed = true;
+
         }else if(Main.holding == lastholding && !Main.holding && Main.dropped){//Supposed to make the goose
             acting = false;
             moving = false;
             Main.dropped = false;
             //grabbed = false;
+
         }
         spriteRenderer();
     }
     public void spriteRenderer(){
         idling = false;
-        if(moving){ // while moving the goose position and sprite is updated
+        if(moving){ //sprite is updated
             gooseSpriteCounter++;
             if (gooseSpriteCounter > 10) {
                 gooseSpriteNum = (gooseSpriteNum == 1) ? 2 : 1;

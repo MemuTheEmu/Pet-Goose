@@ -9,7 +9,7 @@ import java.awt.event.MouseEvent;
 
 public class GamePanel extends JPanel implements Runnable {
     final int originalTileSize = 16;
-    final int scale = 3;
+    final int scale = 4;
 
     public final int tileSize = originalTileSize * scale;
 
@@ -22,7 +22,7 @@ public class GamePanel extends JPanel implements Runnable {
     public Goose goose;
 
     public GamePanel(JFrame window){
-        this.setPreferredSize(new Dimension(48,48));
+        this.setPreferredSize(new Dimension(64,64));
         this.setOpaque(false);
         this.setDoubleBuffered(true);
         this.addKeyListener(keyH);
@@ -90,6 +90,7 @@ public class GamePanel extends JPanel implements Runnable {
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g;
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR);
         goose.draw(g2);
     }
 }
